@@ -17,8 +17,9 @@ function preprocessWrapper(dataFolder, subjectID, runNumber, anatomicalPath, MNI
     %   subjectID: Name of the subject folder located in dataFolder. eg.
     %   sub-01.
     %   runNumber: The run you want to analyze. Use string input e.g. '1'
+    %   anatomicalPath: Path to anatomical image you want to process
+    %   MNITemplate: You can find one in FSLDIR
     % 
-    % example call: preprocessWrapper('/Users/data/Group1_CLR', 'sub-04', '1')
     %
     %
 
