@@ -1,4 +1,4 @@
-function preprocessWrapper(dataFolder, subjectID, runNumber, anatomicalPath, MNITemplate)
+function preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, MNITemplate)
 
     % IMPORTANT!!!! This script won't run if you do not start MATLAB from 
     % your terminal. If you are on linux, run "matlab". If you are on mac,
@@ -14,37 +14,38 @@ function preprocessWrapper(dataFolder, subjectID, runNumber, anatomicalPath, MNI
     % These are the preprocessed final output converted to NIFTI.
     %
     %   dataFolder: BIDS folder where your subjects are located
-    %   subjectID: Name of the subject folder located in dataFolder. eg.
+    %   subjectID: Name of the subject folder located in dataFolder. e.g
     %   sub-01.
+    %   sessionID: Name of the session folder located in subject folder e.g
+    %   ses-PPN. 
     %   runNumber: The run you want to analyze. Use string input e.g. '1'
     %   anatomicalPath: Path to anatomical image you want to process
-    %   MNITemplate: You can find one in FSLDIR
-    % 
-    %
-    %
+    %   MNITemplate: You can find one in $FSLDIR/data/standard. use 1mm MNI
+    %   use the _brain one. 
 
     % Build and run the preprocessing setup
-    afni_line = ['cd ' fullfile(dataFolder, subjectID) ';' 'afni_proc.py ' ...,
+    afni_line = ['cd ' fullfile(dataFolder, subjectID, sessionID) ';' 'afni_proc.py ' ...,
     '-subj_id ' subjectID ' ' ...,
     '-blocks despike tshift align tlrc volreg mask combine blur scale regress ' ...,
     '-radial_correlate_blocks tcat volreg ' ...,
     '-copy_anat ' anatomicalPath ' '  ...,
     '-anat_has_skull yes ' ..., 
-    '-blip_forward_dset func/' subjectID '_task-rest_dir-PA_run-' runNumber '_echo-1_part-mag_bold.nii.gz ' ..., 
-    '-blip_reverse_dset fmap/' subjectID '_acq-e1_dir-AP_run-' runNumber '_epi.nii.gz ' ..., 
-    '-dsets_me_run func/' subjectID '_task-rest_dir-PA_run-' runNumber '_echo-*_part-mag_bold.nii.gz ' ..., 
+    '-blip_forward_dset func/' subjectID '_ses-' sessionID '_task-rest_dir-PA_run-' runNumber '_echo-1_part-mag_bold.nii.gz ' ..., 
+    '-blip_reverse_dset fmap/' subjectID '_ses-' sessionID '_acq-e1_dir-AP_run-' runNumber '_epi.nii.gz ' ..., 
+    '-dsets_me_run func/' subjectID '_ses-' sessionID '_task-rest_dir-PA_run-' runNumber '_echo-*_part-mag_bold.nii.gz ' ..., 
     '-tshift_interp -wsinc9 ' ..., 
     '-align_unifize_epi local ' ..., 
     '-align_opts_aea -cost lpc+ZZ -giant_move -check_flip ' ...,
     '-tlrc_base ' MNITemplate ..., 
     '-tlrc_NL_warp ' ..., 
+    '-tlrc_no_ss ' ...,
     '-volreg_align_to MIN_OUTLIER ' ...,
     '-volreg_align_e2a ' ..., 
     '-volreg_tlrc_warp ' ...,
     '-volreg_post_vr_allin yes ' ..., 
     '-volreg_pvra_base_index MIN_OUTLIER ' ...,
     '-volreg_compute_tsnr yes ' ..., 
-    '-volreg_warp_dxyz 2.5'
+    '-volreg_warp_dxyz 2'
     '-combine_method m_tedana_m_tedort -echo_times 13 30 46 -reg_echo 2 ' ..., 
     '-blur_size 0 ' ..., 
     '-blur_in_mask yes ' ..., 
@@ -58,7 +59,8 @@ function preprocessWrapper(dataFolder, subjectID, runNumber, anatomicalPath, MNI
     '-regress_censor_outliers 0.05 ' ..., 
     '-regress_apply_mot_types demean deriv ' ..., 
     '-regress_est_blur_epits ' ...,
-    '-html_review_style pythonic'];
+    '-html_review_style pythonic'
+    '-remove_preproc_files'];
 
     system(afni_line);
     
