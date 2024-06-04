@@ -1,4 +1,4 @@
-function addSliceTime(dataFolder, subjectID)
+function addSliceTime(dataFolder, subjectID, sessionID)
     
     % IMPORTANT!!!! This script won't run if you do not start MATLAB from 
     % your terminal. If you are on linux, run "matlab". If you are on mac,
@@ -14,6 +14,7 @@ function addSliceTime(dataFolder, subjectID)
     %
     %   dataFolder:  BIDS folder containing subject folders
     %   subjectID:   The ID of the subject you want to use (e.g sub-04)
+    %   sessionID:   The ID of the session (e.g ses-PPN)
     %   afniBinPath: Path to afni functions. If you can run them these 
     %                functions from your terminal, you can find this path 
     %                by running 'which abids_tools' from a terminal
@@ -23,17 +24,16 @@ function addSliceTime(dataFolder, subjectID)
     %
 
     % Get the files in the func and fmap dir
-    subjectDir = fullfile(dataFolder, subjectID);
+    subjectDir = fullfile(dataFolder, subjectID, sessionID);
     funcDir = dir(fullfile(subjectDir, 'func'));
     fmapDir = dir(fullfile(subjectDir, 'fmap'));
     funcDir = funcDir(3:end, :);
-    fmapDir = fmapDir(3:end, :);
     
     % Loop through the files
     fprintf('Adding slice timing info to nifti files in func. This might take a while \n')
     for ii = 1:length(funcDir)
         if contains(funcDir(ii).name, 'nii.gz') && ~contains(funcDir(ii).name, 'sbref')
-            path = fullfile(dataFolder, subjectID, 'func', funcDir(ii).name);
+            path = fullfile(dataFolder, subjectID, sessionID, 'func', funcDir(ii).name);
             system(['abids_tool.py -add_slice_times -input ' path]);
         end
     end
