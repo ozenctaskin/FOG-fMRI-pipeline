@@ -30,13 +30,16 @@ function preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomic
     '-radial_correlate_blocks tcat volreg ' ...,
     '-copy_anat ' anatomicalPath ' '  ...,
     '-anat_has_skull yes ' ..., 
-    '-blip_forward_dset func/' subjectID '_ses-' sessionID '_task-rest_dir-PA_run-' runNumber '_echo-1_part-mag_bold.nii.gz ' ..., 
-    '-blip_reverse_dset fmap/' subjectID '_ses-' sessionID '_acq-e1_dir-AP_run-' runNumber '_epi.nii.gz ' ..., 
-    '-dsets_me_run func/' subjectID '_ses-' sessionID '_task-rest_dir-PA_run-' runNumber '_echo-*_part-mag_bold.nii.gz ' ..., 
+    '-anat_follower_ROI FSvent epi ' '/Applications/freesurfer/subjects/sub-04/SUMA/fs_ap_latvent.nii.gz ' ...,      
+    '-anat_follower_ROI FSWe epi ' '/Applications/freesurfer/subjects/sub-04/SUMA/fs_ap_wm.nii.gz ' ...,            
+    '-anat_follower_erode FSvent FSWe ' ...,
+    '-blip_forward_dset func/' subjectID '_' sessionID '_task-rest_dir-PA_run-' runNumber '_echo-1_part-mag_bold.nii.gz ' ..., 
+    '-blip_reverse_dset fmap/' subjectID '_' sessionID '_acq-e1_dir-AP_run-' runNumber '_epi.nii.gz ' ..., 
+    '-dsets_me_run func/' subjectID '_' sessionID '_task-rest_dir-PA_run-' runNumber '_echo-*_part-mag_bold.nii.gz ' ..., 
     '-tshift_interp -wsinc9 ' ..., 
     '-align_unifize_epi local ' ..., 
     '-align_opts_aea -cost lpc+ZZ -giant_move -check_flip ' ...,
-    '-tlrc_base ' MNITemplate ..., 
+    '-tlrc_base ' MNITemplate ' ' ..., 
     '-tlrc_NL_warp ' ..., 
     '-tlrc_no_ss ' ...,
     '-volreg_align_to MIN_OUTLIER ' ...,
@@ -45,7 +48,7 @@ function preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomic
     '-volreg_post_vr_allin yes ' ..., 
     '-volreg_pvra_base_index MIN_OUTLIER ' ...,
     '-volreg_compute_tsnr yes ' ..., 
-    '-volreg_warp_dxyz 2'
+    '-volreg_warp_dxyz 2 ' ...,
     '-combine_method m_tedana_m_tedort -echo_times 13 30 46 -reg_echo 2 ' ..., 
     '-blur_size 0 ' ..., 
     '-blur_in_mask yes ' ..., 
@@ -59,7 +62,7 @@ function preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomic
     '-regress_censor_outliers 0.05 ' ..., 
     '-regress_apply_mot_types demean deriv ' ..., 
     '-regress_est_blur_epits ' ...,
-    '-html_review_style pythonic'
+    '-html_review_style pythonic ' ..., 
     '-remove_preproc_files'];
 
     system(afni_line);
@@ -70,7 +73,7 @@ function preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomic
     system(['mv ' procScript ' ' newProcName]);
 
     % Run the preprocessing
-    system(['cd ' fullfile(dataFolder, subjectID) '; ' 'tcsh -xef proc.' subjectID '.run-' runNumber ' 2>&1 | tee output.proc.' subjectID '.run-' runNumber]);
+    system(['cd ' fullfile(dataFolder, subjectID, sessionID) '; ' 'tcsh -xef proc.' subjectID '.run-' runNumber ' 2>&1 | tee output.proc.' subjectID '.run-' runNumber]);
 
     % Convert func and anat results to nifti 
     outputFolder = fullfile(dataFolder, subjectID, [subjectID '.results']);
