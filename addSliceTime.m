@@ -26,7 +26,6 @@ function addSliceTime(dataFolder, subjectID, sessionID)
     % Get the files in the func and fmap dir
     subjectDir = fullfile(dataFolder, subjectID, sessionID);
     funcDir = dir(fullfile(subjectDir, 'func'));
-    fmapDir = dir(fullfile(subjectDir, 'fmap'));
     funcDir = funcDir(3:end, :);
     
     % Loop through the files
