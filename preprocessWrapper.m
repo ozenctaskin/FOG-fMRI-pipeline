@@ -84,14 +84,14 @@ function preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomic
     system(['cd ' fullfile(dataFolder, subjectID, sessionID) '; ' 'tcsh -xef proc.' subjectID '.run-' runNumber ' 2>&1 | tee output.proc.' subjectID '.run-' runNumber]);
 
     % Convert func and anat results to nifti 
-    outputFolder = fullfile(dataFolder, subjectID, [subjectID '.results']);
+    outputFolder = fullfile(dataFolder, subjectID, sessionID, [subjectID '.results']);
     func = fullfile(outputFolder, ['errts.' subjectID '.fanaticor+tlrc.HEAD']);
     anat = fullfile(outputFolder, ['anat_final.' subjectID '+tlrc.HEAD']);
     system(['cd ' outputFolder ';' '3dAFNItoNIFTI -prefix final_func ' func]);
     system(['cd ' outputFolder ';' '3dAFNItoNIFTI -prefix final_anat ' anat]);
 
     % Add the run number to the folder
-    newOutputName = fullfile(dataFolder, subjectID, [subjectID '.results.run-' runNumber]);
+    newOutputName = fullfile(dataFolder, subjectID, sessionID, [subjectID '.results.run-' runNumber]);
     system(['mv ' outputFolder ' ' newOutputName]);
 
 end
