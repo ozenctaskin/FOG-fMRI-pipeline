@@ -55,7 +55,7 @@ function preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomic
     '-volreg_post_vr_allin yes ' ..., 
     '-volreg_pvra_base_index MIN_OUTLIER ' ...,
     '-volreg_compute_tsnr yes ' ..., 
-    '-volreg_warp_dxyz 2 ' ...,
+    '-volreg_warp_dxyz 2.5 ' ...,
     '-combine_method m_tedana_m_tedort -echo_times 13 30 46 -reg_echo 2 ' ..., 
     '-blur_size 0 ' ..., 
     '-blur_in_mask yes ' ..., 
@@ -69,6 +69,7 @@ function preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomic
     '-regress_censor_outliers 0.05 ' ..., 
     '-regress_apply_mot_types demean deriv ' ..., 
     '-regress_est_blur_epits ' ...,
+    '-regress_est_blur_errts ' ..., 
     '-html_review_style pythonic ' ..., 
     '-remove_preproc_files'];
 
