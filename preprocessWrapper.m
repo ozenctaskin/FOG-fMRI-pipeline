@@ -57,7 +57,7 @@ function preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomic
     '-volreg_compute_tsnr yes ' ..., 
     '-volreg_warp_dxyz 2.5 ' ...,
     '-combine_method m_tedana_m_tedort -echo_times 13 30 46 -reg_echo 2 ' ..., 
-    '-blur_size 2 ' ..., 
+    '-blur_size 4 ' ..., 
     '-blur_in_mask yes ' ..., 
     '-mask_epi_anat yes ' ...,
     '-regress_motion_per_run ' ...,
