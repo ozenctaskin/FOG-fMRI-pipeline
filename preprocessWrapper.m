@@ -70,6 +70,7 @@ function preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomic
     '-regress_apply_mot_types demean deriv ' ..., 
     '-regress_est_blur_epits ' ...,
     '-regress_est_blur_errts ' ..., 
+    '-regress_bandpass 0.008 0.09 ' ..., 
     '-html_review_style pythonic ' ..., 
     '-remove_preproc_files'];
 
