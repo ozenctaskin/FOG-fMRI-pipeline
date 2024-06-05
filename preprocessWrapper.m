@@ -22,6 +22,13 @@ function preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomic
     %   anatomicalPath: Path to anatomical image you want to process
     %   MNITemplate: You can find one in $FSLDIR/data/standard. use 1mm MNI
     %   use the _brain one. 
+    
+    % Set up variables we will use 
+    ventricles = fullfile(getenv('SUBJECTS_DIR'), subjectID, 'SUMA', 'fs_ap_latvent.nii.gz');
+    white_matter = fullfile(getenv('SUBJECTS_DIR'), subjectID, 'SUMA', 'fs_ap_wm.nii.gz');
+    blipForward = fullfile(dataFolder, subjectID, sessionID, 'func', [subjectID '_' sessionID '_task-rest_dir-PA_run-' runNumber '_echo-1_part-mag_bold.nii.gz']);
+    blipReverse = fullfile(dataFolder, subjectID, sessionID, 'fmap', [subjectID '_' sessionID '_acq-e1_dir-AP_run-' runNumber '_epi.nii.gz']);
+    funcDataset = fullfile(dataFolder, subjectID, sessionID, 'func', [subjectID '_' sessionID '_task-rest_dir-PA_run-' runNumber '_echo-*_part-mag_bold.nii.gz']);
 
     % Build and run the preprocessing setup
     afni_line = ['cd ' fullfile(dataFolder, subjectID, sessionID) ';' 'afni_proc.py ' ...,
@@ -30,12 +37,12 @@ function preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomic
     '-radial_correlate_blocks tcat volreg ' ...,
     '-copy_anat ' anatomicalPath ' '  ...,
     '-anat_has_skull yes ' ..., 
-    '-anat_follower_ROI FSvent epi ' '/Applications/freesurfer/subjects/sub-04/SUMA/fs_ap_latvent.nii.gz ' ...,      
-    '-anat_follower_ROI FSWe epi ' '/Applications/freesurfer/subjects/sub-04/SUMA/fs_ap_wm.nii.gz ' ...,            
+    '-anat_follower_ROI FSvent epi ' ventricles ' ' ...,      
+    '-anat_follower_ROI FSWe epi ' white_matter ' ' ...,            
     '-anat_follower_erode FSvent FSWe ' ...,
-    '-blip_forward_dset func/' subjectID '_' sessionID '_task-rest_dir-PA_run-' runNumber '_echo-1_part-mag_bold.nii.gz ' ..., 
-    '-blip_reverse_dset fmap/' subjectID '_' sessionID '_acq-e1_dir-AP_run-' runNumber '_epi.nii.gz ' ..., 
-    '-dsets_me_run func/' subjectID '_' sessionID '_task-rest_dir-PA_run-' runNumber '_echo-*_part-mag_bold.nii.gz ' ..., 
+    '-blip_forward_dset ' blipForward ' ' ..., 
+    '-blip_reverse_dset ' blipReverse ' ' ..., 
+    '-dsets_me_run ' funcDataset ' ' ..., 
     '-tshift_interp -wsinc9 ' ..., 
     '-align_unifize_epi local ' ..., 
     '-align_opts_aea -cost lpc+ZZ -giant_move -check_flip ' ...,
@@ -68,8 +75,8 @@ function preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomic
     system(afni_line);
     
     % Add the run number to the proc script that AFNI creates
-    procScript = fullfile(dataFolder, subjectID, ['proc.' subjectID]);
-    newProcName = fullfile(dataFolder, subjectID, ['proc.' subjectID '.' 'run-' runNumber]);
+    procScript = fullfile(dataFolder, subjectID, sessionID, ['proc.' subjectID]);
+    newProcName = fullfile(dataFolder, subjectID, sessionID, ['proc.' subjectID '.' 'run-' runNumber]);
     system(['mv ' procScript ' ' newProcName]);
 
     % Run the preprocessing
@@ -77,8 +84,8 @@ function preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomic
 
     % Convert func and anat results to nifti 
     outputFolder = fullfile(dataFolder, subjectID, [subjectID '.results']);
-    func = fullfile(outputFolder, ['all_runs.' subjectID '+orig.HEAD']);
-    anat = fullfile(outputFolder, ['anat_final.' subjectID '+orig.HEAD']);
+    func = fullfile(outputFolder, ['errts.' subjectID '.fanaticor+tlrc.HEAD']);
+    anat = fullfile(outputFolder, ['anat_final.' subjectID '+tlrc.HEAD']);
     system(['cd ' outputFolder ';' '3dAFNItoNIFTI -prefix final_func ' func]);
     system(['cd ' outputFolder ';' '3dAFNItoNIFTI -prefix final_anat ' anat]);
 
