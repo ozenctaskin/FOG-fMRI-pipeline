@@ -30,10 +30,14 @@ function preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomic
     blipReverse = fullfile(dataFolder, subjectID, sessionID, 'fmap', [subjectID '_' sessionID '_acq-e1_dir-AP_run-' runNumber '_epi.nii.gz']);
     funcDataset = fullfile(dataFolder, subjectID, sessionID, 'func', [subjectID '_' sessionID '_task-rest_dir-PA_run-' runNumber '_echo-*_part-mag_bold.nii.gz']);
 
-    % Build and run the preprocessing setup
+    % Build and run the preprocessing setup. No blurring. If you need to
+    % add it back. It needs to come after combine block. Also add the below
+    % info to the main body
+    %    '-blur_size 4 ' ..., 
+    %    '-blur_in_mask yes ' ..., 
     afni_line = ['cd ' fullfile(dataFolder, subjectID, sessionID) ';' 'afni_proc.py ' ...,
     '-subj_id ' subjectID ' ' ...,
-    '-blocks despike tshift align tlrc volreg mask combine blur scale regress ' ...,
+    '-blocks despike tshift align tlrc volreg mask combine scale regress ' ...,
     '-radial_correlate_blocks tcat volreg ' ...,
     '-copy_anat ' anatomicalPath ' '  ...,
     '-anat_has_skull yes ' ..., 
@@ -57,8 +61,6 @@ function preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomic
     '-volreg_compute_tsnr yes ' ..., 
     '-volreg_warp_dxyz 2.5 ' ...,
     '-combine_method m_tedana_m_tedort -echo_times 13 30 46 -reg_echo 2 ' ..., 
-    '-blur_size 4 ' ..., 
-    '-blur_in_mask yes ' ..., 
     '-mask_epi_anat yes ' ...,
     '-regress_motion_per_run ' ...,
     '-regress_ROI_PC FSvent 3 ' ..., 
