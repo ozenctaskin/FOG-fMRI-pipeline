@@ -1,4 +1,4 @@
-function preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, MNITemplate)
+function preprocessWrapperMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, MNITemplate)
 
     % IMPORTANT!!!! This script won't run if you do not start MATLAB from 
     % your terminal. If you are on linux, run "matlab". If you are on mac,
@@ -7,11 +7,15 @@ function preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomic
     % of the terminal, matlab cannot access your $PATH variables and uses 
     % its own paths, so afni functions can't be found.
     %
-    % This script performs preprocessing with AFNI, renames analysis output
-    % with the run number so that you can analyze different runs in the
-    % same subject separately, and convert necessary files to nifti. In the
-    % results folder look for final_func.nii and final_anat.nii files.
-    % These are the preprocessed final output converted to NIFTI.
+    % Note: For resting state preprocessing only. You need to run the 
+    % runReconAll.m function first for this to work.
+    %
+    % This script performs preprocessing on multi-echo images with AFNI. 
+    % Use it if you want to analyze every run separately. This is
+    % applicable for instance if you take the subject out of the scanner in
+    % the middle of the scan and therefore have multiple fieldmap images. 
+    % In the results folder look for final_func.nii and final_anat.nii
+    % files. These are your preprocessed final output converted to NIFTI. 
     %
     %   dataFolder: BIDS folder where your subjects are located
     %   subjectID: Name of the subject folder located in dataFolder. e.g

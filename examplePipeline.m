@@ -12,11 +12,16 @@ dataFolder = 'Enter folder path here';
 % directory works well (fsl/data/standard/MNI152_T1_1mm_brain.nii.gz)
 templatePath = 'Enter template path here'; 
 
-%% Analysis block 
+%% Analysis block. Repeat this as neeeded
 subjectID = 'Enter subject ID to process';
 sessionID = 'Enter session ID to process';
 anatomicalPath = 'Enter path to T1 image';
 runNumber = 'Enter the run you want to process';
+
+% If you have MP2RAGE images, you can use the makeAnat function to clean
+% them up. That functions outputs the final cleaned up dataset so that you
+% can directly set your anatomicalPath to its output:
+%   anatomicalPath = makeAnat(inv2, unit)
 
 % Run this once per each subject
 runReconAll(anatomicalPath, subjectID)
@@ -25,7 +30,7 @@ runReconAll(anatomicalPath, subjectID)
 addSliceTime(dataFolder, subjectID, sessionID)
 
 % Run this for each run of each session of each subject.
-preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath)
+preprocessWrapperMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath)
 
 % Below is an example where we analyze 2 runs from 1 subject with a single 
 % session.
@@ -38,9 +43,9 @@ preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, t
 % addSliceTime(dataFolder, subjectID, sessionID)
 %
 % runNumber = '1';
-% preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath)
+% preprocessWrapperMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath)
 %
 % runNumber = '2';
-% preprocessWrapper(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath)
+% preprocessWrapperMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath)
  
 
