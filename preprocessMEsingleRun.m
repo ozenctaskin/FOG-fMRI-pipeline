@@ -33,6 +33,18 @@ function preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anat
     blipForward = fullfile(dataFolder, subjectID, sessionID, 'func', [subjectID '_' sessionID '_task-rest_dir-PA_run-' runNumber '_echo-1_part-mag_bold.nii.gz']);
     blipReverse = fullfile(dataFolder, subjectID, sessionID, 'fmap', [subjectID '_' sessionID '_acq-e1_dir-AP_run-' runNumber '_epi.nii.gz']);
     funcDataset = fullfile(dataFolder, subjectID, sessionID, 'func', [subjectID '_' sessionID '_task-rest_dir-PA_run-' runNumber '_echo-*_part-mag_bold.nii.gz']);
+    subjectDir = fullfile(dataFolder, subjectID, sessionID);
+    funcDir = dir(fullfile(subjectDir, 'func'));
+    funcDir = funcDir(3:end, :);
+
+    % Loop through the files and add slice timing information to the nifti  
+    fprintf('Adding slice timing info to nifti files in func. This might take a while \n')
+    for ii = 1:length(funcDir)
+        if contains(funcDir(ii).name, 'nii.gz') && ~contains(funcDir(ii).name, 'sbref')
+            path = fullfile(dataFolder, subjectID, sessionID, 'func', funcDir(ii).name);
+            system(['abids_tool.py -add_slice_times -input ' path]);
+        end
+    end
 
     % Build and run the preprocessing setup. No blurring. If you need to
     % add it back. It needs to come after combine block. Also add the below
