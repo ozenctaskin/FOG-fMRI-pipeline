@@ -26,9 +26,6 @@ runNumber = 'Enter the run you want to process';
 % Run this once per each subject
 runReconAll(anatomicalPath, subjectID)
 
-% Run this once per each session of each subject
-addSliceTime(dataFolder, subjectID, sessionID)
-
 % Run this for each run of each session of each subject.
 preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath)
 
