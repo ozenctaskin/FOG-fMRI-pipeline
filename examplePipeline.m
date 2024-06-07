@@ -30,7 +30,7 @@ runReconAll(anatomicalPath, subjectID)
 addSliceTime(dataFolder, subjectID, sessionID)
 
 % Run this for each run of each session of each subject.
-preprocessWrapperMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath)
+preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath)
 
 % Below is an example where we analyze 2 runs from 1 subject with a single 
 % session.
@@ -43,9 +43,9 @@ preprocessWrapperMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatom
 % addSliceTime(dataFolder, subjectID, sessionID)
 %
 % runNumber = '1';
-% preprocessWrapperMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath)
+% preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath)
 %
 % runNumber = '2';
-% preprocessWrapperMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath)
+% preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath)
  
 

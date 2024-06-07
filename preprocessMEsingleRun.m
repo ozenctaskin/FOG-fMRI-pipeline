@@ -1,4 +1,4 @@
-function preprocessWrapperMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, MNITemplate)
+function preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, MNITemplate)
 
     % IMPORTANT!!!! This script won't run if you do not start MATLAB from 
     % your terminal. If you are on linux, run "matlab". If you are on mac,
