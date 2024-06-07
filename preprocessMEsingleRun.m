@@ -40,7 +40,7 @@ function preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anat
     % Loop through the files and add slice timing information to the nifti  
     fprintf('Adding slice timing info to nifti files in func. This might take a while \n')
     for ii = 1:length(funcDir)
-        if contains(funcDir(ii).name, 'nii.gz') && ~contains(funcDir(ii).name, 'sbref')
+        if contains(funcDir(ii).name, 'nii') && ~contains(funcDir(ii).name, 'sbref')
             path = fullfile(dataFolder, subjectID, sessionID, 'func', funcDir(ii).name);
             system(['abids_tool.py -add_slice_times -input ' path]);
         end
