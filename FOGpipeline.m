@@ -14,11 +14,10 @@ runReconAll('/home/chenlab-linux/Desktop/FOG/healthyControls/bidsFolder/sub-pFOG
 runReconAll('/home/chenlab-linux/Desktop/FOG/healthyControls/bidsFolder/sub-pFOG8/ses-CLR/anat/sub-pFOG8_ses-CLR_acq-MP2RAGE_UNIT1_unbiased_clean.nii', 'sub-pFOG8');
 
 
+%% Process subjects
 % Run func
 dataFolder = '/home/chenlab-linux/Desktop/FOG/healthyControls/bidsFolder/';
-templatePath = fullfile(getenv('FSLDIR'), 'data', 'standard', 'MNI152_T1_1mm.nii.gz';
-
-%% Process subjects
+templatePath = fullfile(getenv('FSLDIR'), 'data', 'standard', 'MNI152_T1_1mm.nii.gz');
 subjects = {'sub-pFOG3', 'sub-pFOG4', 'sub-pFOG6', 'sub-pFOG7', 'sub-pFOG8'};
 anatomicals = {'/home/chenlab-linux/Desktop/FOG/healthyControls/bidsFolder/sub-pFOG3/ses-PPN/anat/sub-pFOG3_ses-PPN_acq-MP2RAGE_UNIT1_unbiased_clean.nii', ...
                '/home/chenlab-linux/Desktop/FOG/healthyControls/bidsFolder/sub-pFOG4/ses-PPN/anat/sub-pFOG4_ses-PPN_acq-MPRAGE_rec-RMS_run-2_part-mag_T1w.nii.gz', ...
