@@ -1,4 +1,4 @@
-function preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, MNITemplate)
+function preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, MNITemplate, blur, addSliceTime)
 
     % IMPORTANT!!!! This script won't run if you do not start MATLAB from 
     % your terminal. If you are on linux, run "matlab". If you are on mac,
@@ -38,11 +38,13 @@ function preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anat
     funcDir = funcDir(3:end, :);
 
     % Loop through the files and add slice timing information to the nifti  
-    fprintf('Adding slice timing info to nifti files in func. This might take a while \n')
-    for ii = 1:length(funcDir)
-        if contains(funcDir(ii).name, 'nii') && ~contains(funcDir(ii).name, 'sbref')
-            path = fullfile(dataFolder, subjectID, sessionID, 'func', funcDir(ii).name);
-            system(['abids_tool.py -add_slice_times -input ' path]);
+    if istrue(addSliceTime)
+        fprintf('Adding slice timing info to nifti files in func. This might take a while \n')
+        for ii = 1:length(funcDir)
+            if contains(funcDir(ii).name, 'nii') && ~contains(funcDir(ii).name, 'sbref')
+                path = fullfile(dataFolder, subjectID, sessionID, 'func', funcDir(ii).name);
+                system(['abids_tool.py -add_slice_times -input ' path]);
+            end
         end
     end
 
@@ -51,56 +53,110 @@ function preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anat
     % info to the main body
     %    '-blur_size 4 ' ..., 
     %    '-blur_in_mask yes ' ..., 
-    afni_line = ['cd ' fullfile(dataFolder, subjectID, sessionID) ';' 'afni_proc.py ' ...,
-    '-subj_id ' subjectID ' ' ...,
-    '-blocks despike tshift align tlrc volreg mask combine scale regress ' ...,
-    '-radial_correlate_blocks tcat volreg ' ...,
-    '-copy_anat ' anatomicalPath ' '  ...,
-    '-anat_has_skull yes ' ..., 
-    '-anat_follower_ROI FSvent epi ' ventricles ' ' ...,      
-    '-anat_follower_ROI FSWe epi ' white_matter ' ' ...,            
-    '-anat_follower_erode FSvent FSWe ' ...,
-    '-blip_forward_dset ' blipForward ' ' ..., 
-    '-blip_reverse_dset ' blipReverse ' ' ..., 
-    '-dsets_me_run ' funcDataset ' ' ..., 
-    '-tshift_interp -wsinc9 ' ..., 
-    '-align_unifize_epi local ' ..., 
-    '-align_opts_aea -cost lpc+ZZ -giant_move -check_flip ' ...,
-    '-tlrc_base ' MNITemplate ' ' ..., 
-    '-tlrc_NL_warp ' ..., 
-    '-tlrc_no_ss ' ...,
-    '-volreg_align_to MIN_OUTLIER ' ...,
-    '-volreg_align_e2a ' ..., 
-    '-volreg_tlrc_warp ' ...,
-    '-volreg_post_vr_allin yes ' ..., 
-    '-volreg_pvra_base_index MIN_OUTLIER ' ...,
-    '-volreg_compute_tsnr yes ' ..., 
-    '-volreg_warp_dxyz 2.5 ' ...,
-    '-combine_method m_tedana_m_tedort -echo_times 13 30 46 -reg_echo 2 ' ..., 
-    '-mask_epi_anat yes ' ...,
-    '-regress_motion_per_run ' ...,
-    '-regress_ROI_PC FSvent 3 ' ..., 
-    '-regress_ROI_PC_per_run FSvent ' ..., 
-    '-regress_anaticor_fast ' ...,
-    '-regress_anaticor_label FSWe ' ...,
-    '-regress_censor_motion 0.2 ' ...,
-    '-regress_censor_outliers 0.05 ' ..., 
-    '-regress_apply_mot_types demean deriv ' ..., 
-    '-regress_est_blur_epits ' ...,
-    '-regress_est_blur_errts ' ..., 
-    '-regress_bandpass 0.008 0.09 ' ..., 
-    '-html_review_style pythonic ' ..., 
-    '-remove_preproc_files'];
+    if strcmp(blur, 'NA')
+        afni_line = ['cd ' fullfile(dataFolder, subjectID, sessionID) ';' 'afni_proc.py ' ...,
+        '-subj_id ' subjectID ' ' ...,
+        '-blocks despike tshift align tlrc volreg mask combine scale regress ' ...,
+        '-radial_correlate_blocks tcat volreg ' ...,
+        '-copy_anat ' anatomicalPath ' '  ...,
+        '-anat_has_skull yes ' ..., 
+        '-anat_follower_ROI FSvent epi ' ventricles ' ' ...,      
+        '-anat_follower_ROI FSWe epi ' white_matter ' ' ...,            
+        '-anat_follower_erode FSvent FSWe ' ...,
+        '-blip_forward_dset ' blipForward ' ' ..., 
+        '-blip_reverse_dset ' blipReverse ' ' ..., 
+        '-dsets_me_run ' funcDataset ' ' ..., 
+        '-tshift_interp -wsinc9 ' ..., 
+        '-align_unifize_epi local ' ..., 
+        '-align_opts_aea -cost lpc+ZZ -giant_move -check_flip ' ...,
+        '-tlrc_base ' MNITemplate ' ' ..., 
+        '-tlrc_NL_warp ' ..., 
+        '-tlrc_no_ss ' ...,
+        '-volreg_align_to MIN_OUTLIER ' ...,
+        '-volreg_align_e2a ' ..., 
+        '-volreg_tlrc_warp ' ...,
+        '-volreg_post_vr_allin yes ' ..., 
+        '-volreg_pvra_base_index MIN_OUTLIER ' ...,
+        '-volreg_compute_tsnr yes ' ..., 
+        '-volreg_warp_dxyz 2.5 ' ...,
+        '-combine_method m_tedana_m_tedort -echo_times 13 30 46 -reg_echo 2 ' ..., 
+        '-mask_epi_anat yes ' ...,
+        '-regress_motion_per_run ' ...,
+        '-regress_ROI_PC FSvent 3 ' ..., 
+        '-regress_ROI_PC_per_run FSvent ' ..., 
+        '-regress_anaticor_fast ' ...,
+        '-regress_anaticor_label FSWe ' ...,
+        '-regress_censor_motion 0.2 ' ...,
+        '-regress_censor_outliers 0.05 ' ..., 
+        '-regress_apply_mot_types demean deriv ' ..., 
+        '-regress_est_blur_epits ' ...,
+        '-regress_est_blur_errts ' ..., 
+        '-html_review_style pythonic ' ..., 
+        '-remove_preproc_files'];
+    else
+        afni_line = ['cd ' fullfile(dataFolder, subjectID, sessionID) ';' 'afni_proc.py ' ...,
+        '-subj_id ' subjectID ' ' ...,
+        '-blocks despike tshift align tlrc volreg mask combine blur scale regress ' ...,
+        '-radial_correlate_blocks tcat volreg ' ...,
+        '-copy_anat ' anatomicalPath ' '  ...,
+        '-anat_has_skull yes ' ..., 
+        '-anat_follower_ROI FSvent epi ' ventricles ' ' ...,      
+        '-anat_follower_ROI FSWe epi ' white_matter ' ' ...,            
+        '-anat_follower_erode FSvent FSWe ' ...,
+        '-blip_forward_dset ' blipForward ' ' ..., 
+        '-blip_reverse_dset ' blipReverse ' ' ..., 
+        '-dsets_me_run ' funcDataset ' ' ..., 
+        '-tshift_interp -wsinc9 ' ..., 
+        '-align_unifize_epi local ' ..., 
+        '-align_opts_aea -cost lpc+ZZ -giant_move -check_flip ' ...,
+        '-tlrc_base ' MNITemplate ' ' ..., 
+        '-tlrc_NL_warp ' ..., 
+        '-tlrc_no_ss ' ...,
+        '-volreg_align_to MIN_OUTLIER ' ...,
+        '-volreg_align_e2a ' ..., 
+        '-volreg_tlrc_warp ' ...,
+        '-volreg_post_vr_allin yes ' ..., 
+        '-volreg_pvra_base_index MIN_OUTLIER ' ...,
+        '-volreg_compute_tsnr yes ' ..., 
+        '-volreg_warp_dxyz 2.5 ' ...,
+        '-combine_method m_tedana_m_tedort -echo_times 13 30 46 -reg_echo 2 ' ..., 
+        '-mask_epi_anat yes ' ...,
+        '-regress_motion_per_run ' ...,
+        '-regress_ROI_PC FSvent 3 ' ..., 
+        '-regress_ROI_PC_per_run FSvent ' ..., 
+        '-regress_anaticor_fast ' ...,
+        '-regress_anaticor_label FSWe ' ...,
+        '-regress_censor_motion 0.2 ' ...,
+        '-regress_censor_outliers 0.05 ' ..., 
+        '-regress_apply_mot_types demean deriv ' ..., 
+        '-regress_est_blur_epits ' ...,
+        '-regress_est_blur_errts ' ..., 
+        '-html_review_style pythonic ' ..., 
+        '-remove_preproc_files ' ...,
+        '-blur_size ' blur ' ' ..., 
+        '-blur_in_mask yes']; 
+    end
 
     system(afni_line);
     
     % Add the run number to the proc script that AFNI creates
     procScript = fullfile(dataFolder, subjectID, sessionID, ['proc.' subjectID]);
-    newProcName = fullfile(dataFolder, subjectID, sessionID, ['proc.' subjectID '.' 'run-' runNumber]);
+    if strcmp(blur, 'NA')
+        newProcName = fullfile(dataFolder, subjectID, sessionID, ['proc.' subjectID '.' 'run-' runNumber]);
+    else
+        newProcName = fullfile(dataFolder, subjectID, sessionID, ['proc.' subjectID '.' 'run-' runNumber '.blur_' blur 'mm']);
+    end
     system(['mv ' procScript ' ' newProcName]);
 
-    % Run the preprocessing
-    system(['cd ' fullfile(dataFolder, subjectID, sessionID) '; ' 'tcsh -xef proc.' subjectID '.run-' runNumber ' 2>&1 | tee output.proc.' subjectID '.run-' runNumber]);
+    % Set the output text name
+    if strcmp(blur, 'NA')
+        outputReport = fullfile(dataFolder, subjectID, sessionID, ['output.proc.' subjectID '.' 'run-' runNumber]);
+    else
+        outputReport = fullfile(dataFolder, subjectID, sessionID, ['output.proc.' subjectID '.' 'run-' runNumber '.blur_' blur 'mm']);
+    end
+
+    % Run preprocessing 
+    system(['cd ' fullfile(dataFolder, subjectID, sessionID) '; ' 'tcsh -xef ' newProcName ' 2>&1 | tee ' outputReport]);
 
     % Convert func and anat results to nifti 
     outputFolder = fullfile(dataFolder, subjectID, sessionID, [subjectID '.results']);
@@ -110,7 +166,12 @@ function preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anat
     system(['cd ' outputFolder ';' '3dAFNItoNIFTI -prefix final_anat ' anat]);
 
     % Add the run number to the folder
-    newOutputName = fullfile(dataFolder, subjectID, sessionID, [subjectID '.results.run-' runNumber]);
+    if strcmp(blur, 'NA')
+        newOutputName = fullfile(dataFolder, subjectID, sessionID, [subjectID '.results.run-' runNumber]);
+    else
+        newOutputName = fullfile(dataFolder, subjectID, sessionID, [subjectID '.results.run-' runNumber '.blur_' blur 'mm']);
+    end
+
     system(['mv ' outputFolder ' ' newOutputName]);
 
 end
