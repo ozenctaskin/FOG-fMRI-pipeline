@@ -65,3 +65,41 @@ for sub = 1:length(subjects)
         preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false)
     end
 end
+
+%% Process PPN patient
+% makeAnat('/home/chenlab-linux/Desktop/FOG/patients/bidsFolder/sub-pFOGa/ses-PPNexcitatory/anat/sub-pFOGa_ses-PPNexcitatory_run-3_inv-2_part-mag_MP2RAGE.nii.gz', ...
+         % '/home/chenlab-linux/Desktop/FOG/patients/bidsFolder/sub-pFOGa/ses-PPNexcitatory/anat/sub-pFOGa_ses-PPNexcitatory_acq-MP2RAGE_UNIT1.nii.gz')
+
+% runReconAll('/home/chenlab-linux/Desktop/FOG/patients/bidsFolder/sub-pFOGa/ses-PPNexcitatory/anat/sub-pFOGa_ses-PPNexcitatory_acq-MP2RAGE_UNIT1_unbiased_clean.nii', 'sub-pFOGa');
+dataFolder = '/home/chenlab-linux/Desktop/FOG/patients/bidsFolder/';
+templatePath = fullfile(getenv('FSLDIR'), 'data', 'standard', 'MNI152_T1_1mm_brain.nii.gz');
+subjects = {'sub-pFOGa'};
+anatomicals = {'/home/chenlab-linux/Desktop/FOG/patients/bidsFolder/sub-pFOGa/ses-PPNexcitatory/anat/sub-pFOGa_ses-PPNexcitatory_acq-MP2RAGE_UNIT1_unbiased_clean.nii'};
+sessions = {{'ses-PPNexcitatory','ses-PPNinhibitory'}};
+blurFWHM = 'NA';
+% Loop through subjects and sessions and run the analysis
+for sub = 1:length(subjects)
+    subjectID = subjects{sub};
+    anatomicalPath = anatomicals{sub};
+    for ses = 1:length(sessions{sub})
+        sessionID = sessions{sub}{ses};
+        runNumber = '1';
+        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false)
+        runNumber = '2';
+        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false)
+    end
+end
+
+% With blur
+blurFWHM = '4';
+for sub = 1:length(subjects)
+    subjectID = subjects{sub};
+    anatomicalPath = anatomicals{sub};
+    for ses = 1:length(sessions{sub})
+        sessionID = sessions{sub}{ses};
+        runNumber = '1';
+        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false)
+        runNumber = '2';
+        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false)
+    end
+end
