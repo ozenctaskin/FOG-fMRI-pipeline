@@ -44,7 +44,7 @@ function preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anat
     funcDir = funcDir(3:end, :);
 
     % Loop through the files and add slice timing information to the nifti  
-    if istrue(addSliceTime)
+    if addSliceTime == 1
         fprintf('Adding slice timing info to nifti files in func. This might take a while \n')
         for ii = 1:length(funcDir)
             if contains(funcDir(ii).name, 'nii') && ~contains(funcDir(ii).name, 'sbref')
