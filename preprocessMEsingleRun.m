@@ -1,4 +1,4 @@
-function preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, MNITemplate, blur, addSliceTime, skipPCA)
+function preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, MNITemplate, blur, addSliceTime, skipPCA, combineMethod)
 
     % IMPORTANT!!!! This script won't run if you do not start MATLAB from 
     % your terminal. If you are on linux, run "matlab" on your terminal. 
@@ -32,6 +32,7 @@ function preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anat
     %   literature is not solid whether additional PCA analysis is
     %   beneficial after this, so we leave this optional. AFNI examples do
     %   this operation though
+    %   combineMethod: Echo combination method, check AFNI for details
     
     % Set up variables we will use 
     ventricles = fullfile(getenv('SUBJECTS_DIR'), subjectID, 'SUMA', 'fs_ap_latvent.nii.gz');
@@ -44,7 +45,7 @@ function preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anat
     funcDir = funcDir(3:end, :);
 
     % Loop through the files and add slice timing information to the nifti  
-    if addSliceTime == 1
+    if addSliceTime
         fprintf('Adding slice timing info to nifti files in func. This might take a while \n')
         for ii = 1:length(funcDir)
             if contains(funcDir(ii).name, 'nii') && ~contains(funcDir(ii).name, 'sbref')
@@ -61,7 +62,6 @@ function preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anat
     %    '-blur_in_mask yes ' ..., 
     afni_line = ['cd ' fullfile(dataFolder, subjectID, sessionID) ';' 'afni_proc.py ' ...,
     '-subj_id ' subjectID ' ' ...,
-    '-blocks despike tshift align tlrc volreg mask combine scale regress ' ...,
     '-radial_correlate_blocks tcat volreg ' ...,
     '-copy_anat ' anatomicalPath ' '  ...,
     '-anat_has_skull yes ' ..., 
@@ -84,7 +84,8 @@ function preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anat
     '-volreg_pvra_base_index MIN_OUTLIER ' ...,
     '-volreg_compute_tsnr yes ' ..., 
     '-volreg_warp_dxyz 2.5 ' ...,
-    '-combine_method m_tedana_m_tedort -echo_times 13 30 46 -reg_echo 2 ' ..., 
+    '-combine_method ' combineMethod ' ' ...,
+    '-echo_times 13.20 29.94 46.66 -reg_echo 2 ' ..., 
     '-mask_epi_anat yes ' ...,
     '-regress_motion_per_run ' ...,
     '-regress_censor_motion 0.2 ' ...,
@@ -97,11 +98,13 @@ function preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anat
     
     % If blur is specified, add it to the function. 
     if ~strcmp(blur, 'NA')
-        afni_line = [afni_line ' -blur_size ' blur ' -blur_in_mask yes'];
+        afni_line = [afni_line ' -blur_size ' blur ' -blur_in_mask yes -blocks despike tshift align tlrc volreg mask combine blur scale regress'];
+    else
+        afni_line = [afni_line ' -blocks despike tshift align tlrc volreg mask combine scale regress'];
     end
     
     % Check if PCA is skipped or not 
-    if skipPCA == 1
+    if ~skipPCA
         afni_line = [afni_line ' -regress_ROI_PC FSvent 3 -regress_ROI_PC_per_run FSvent -regress_anaticor_fast -regress_anaticor_label FSWe'];
     end
 
