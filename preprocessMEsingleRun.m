@@ -1,4 +1,4 @@
-function preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, MNITemplate, blur, addSliceTime, skipPCA, combineMethod)
+function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, MNITemplate, blur, addSliceTime, skipPCA, combineMethod, inputWarp)
 
     % IMPORTANT!!!! This script won't run if you do not start MATLAB from 
     % your terminal. If you are on linux, run "matlab" on your terminal. 
@@ -44,22 +44,14 @@ function preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anat
     funcDir = dir(fullfile(subjectDir, 'func'));
     funcDir = funcDir(3:end, :);
 
-    % Loop through the files and add slice timing information to the nifti  
+    % Insert slice timing info from json to nifti
     if addSliceTime
-        fprintf('Adding slice timing info to nifti files in func. This might take a while \n')
-        for ii = 1:length(funcDir)
-            if contains(funcDir(ii).name, 'nii') && ~contains(funcDir(ii).name, 'sbref')
-                path = fullfile(dataFolder, subjectID, sessionID, 'func', funcDir(ii).name);
-                system(['abids_tool.py -add_slice_times -input ' path]);
-            end
-        end
+        system(['abids_tool.py -add_slice_times -input ' funcDataset]);
     end
 
     % Build and run the preprocessing setup. No blurring. If you need to
     % add it back. It needs to come after combine block. Also add the below
     % info to the main body
-    %    '-blur_size 4 ' ..., 
-    %    '-blur_in_mask yes ' ..., 
     afni_line = ['cd ' fullfile(dataFolder, subjectID, sessionID) ';' 'afni_proc.py ' ...,
     '-subj_id ' subjectID ' ' ...,
     '-radial_correlate_blocks tcat volreg ' ...,
@@ -107,7 +99,13 @@ function preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anat
     if ~skipPCA
         afni_line = [afni_line ' -regress_ROI_PC FSvent 3 -regress_ROI_PC_per_run FSvent -regress_anaticor_fast -regress_anaticor_label FSWe'];
     end
+    
+    % Get input warp if supplied
+    if ~strcmp(inputWarp, 'NA')
+        afni_line = [afni_line ' -tlrc_NL_warped_dsets ' inputWarp{1} ' ' inputWarp{2} ' ' inputWarp{3}];
+    end
 
+    % Run the afni line
     system(afni_line);
     
     % Add the run number to the proc script that AFNI creates
@@ -145,4 +143,8 @@ function preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anat
 
     system(['mv ' outputFolder ' ' newOutputName]);
 
+    % Return final anat and warps to be used for hte next run
+    warpSet = {fullfile(newOutputName,'final_anat.nii'), ...
+               fullfile(newOutputName,'anat.un.aff.Xat.1D'), ...
+               fullfile(newOutputName,'anat.un.aff.qw_WARP.nii')};
 end
