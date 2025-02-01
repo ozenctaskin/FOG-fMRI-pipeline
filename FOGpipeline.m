@@ -1,4 +1,4 @@
-% % Cleanup MP2RAGE images for subjects
+% % % Cleanup MP2RAGE images for subjects
 % makeAnat('/home/chenlab-linux/Desktop/FOG/healthyControls/bidsFolder/sub-pFOG3/ses-PPN/anat/sub-pFOG3_ses-PPN_run-3_inv-2_part-mag_MP2RAGE.nii.gz', ...
 %          '/home/chenlab-linux/Desktop/FOG/healthyControls/bidsFolder/sub-pFOG3/ses-PPN/anat/sub-pFOG3_ses-PPN_acq-MP2RAGE_UNIT1.nii.gz')
 % makeAnat('/home/chenlab-linux/Desktop/FOG/healthyControls/bidsFolder/sub-pFOG7/ses-PPN/anat/sub-pFOG7_ses-PPN_run-3_inv-2_part-mag_MP2RAGE.nii.gz', ...
@@ -34,9 +34,9 @@ for sub = 1:length(subjects)
     for ses = 1:length(sessions{sub})
         sessionID = sessions{sub}{ses};
         runNumber = '1';
-        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, true, false, combineMethod)
+        inputWarp = preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, true, false, combineMethod, 'NA');
         runNumber = '2';
-        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, false, combineMethod)
+        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, true, false, combineMethod, inputWarp)
     end
 end
 
@@ -48,9 +48,9 @@ for sub = 1:length(subjects)
     for ses = 1:length(sessions{sub})
         sessionID = sessions{sub}{ses};
         runNumber = '1';
-        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, false, combineMethod)
+        inputWarp = preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, false, combineMethod, 'NA');
         runNumber = '2';
-        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, false, combineMethod)
+        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, false, combineMethod, inputWarp)
     end
 end
 
@@ -72,9 +72,9 @@ for sub = 1:length(subjects)
     for ses = 1:length(sessions{sub})
         sessionID = sessions{sub}{ses};
         runNumber = '1';
-        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, true, false, combineMethod)
+        inputWarp = preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, true, false, combineMethod, 'NA');
         runNumber = '2';
-        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, false, combineMethod)
+        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, true, false, combineMethod, inputWarp)
     end
 end
 
@@ -86,8 +86,8 @@ for sub = 1:length(subjects)
     for ses = 1:length(sessions{sub})
         sessionID = sessions{sub}{ses};
         runNumber = '1';
-        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, false, combineMethod)
+        inputWarp = preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, false, combineMethod, 'NA');
         runNumber = '2';
-        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, false, combineMethod)
+        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, false, combineMethod, inputWarp)
     end
 end
