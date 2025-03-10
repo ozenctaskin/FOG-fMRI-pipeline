@@ -34,9 +34,9 @@ for sub = 1:length(subjects)
     for ses = 1:length(sessions{sub})
         sessionID = sessions{sub}{ses};
         runNumber = '1';
-        inputWarp = preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, true, false, combineMethod, 'NA');
+        inputWarp = preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, combineMethod, 'NA');
         runNumber = '2';
-        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, true, false, combineMethod, inputWarp)
+        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, combineMethod, inputWarp)
     end
 end
 
@@ -48,9 +48,9 @@ for sub = 1:length(subjects)
     for ses = 1:length(sessions{sub})
         sessionID = sessions{sub}{ses};
         runNumber = '1';
-        inputWarp = preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, false, combineMethod, 'NA');
+        inputWarp = preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, combineMethod, 'NA');
         runNumber = '2';
-        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, false, combineMethod, inputWarp)
+        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, combineMethod, inputWarp)
     end
 end
 
@@ -72,9 +72,9 @@ for sub = 1:length(subjects)
     for ses = 1:length(sessions{sub})
         sessionID = sessions{sub}{ses};
         runNumber = '1';
-        inputWarp = preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, true, false, combineMethod, 'NA');
+        inputWarp = preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, combineMethod, 'NA');
         runNumber = '2';
-        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, true, false, combineMethod, inputWarp)
+        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, combineMethod, inputWarp)
     end
 end
 
@@ -86,8 +86,8 @@ for sub = 1:length(subjects)
     for ses = 1:length(sessions{sub})
         sessionID = sessions{sub}{ses};
         runNumber = '1';
-        inputWarp = preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, false, combineMethod, 'NA');
+        inputWarp = preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, combineMethod, 'NA');
         runNumber = '2';
-        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, false, combineMethod, inputWarp)
+        preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, templatePath, blurFWHM, false, combineMethod, inputWarp)
     end
 end
