@@ -1,4 +1,4 @@
-function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, MNITemplate, blur, addSliceTime, skipPCA, combineMethod, inputWarp)
+function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNumber, anatomicalPath, MNITemplate, blur, skipPCA, combineMethod, inputWarp)
 
     % IMPORTANT!!!! This script won't run if you do not start MATLAB from 
     % your terminal. If you are on linux, run "matlab" on your terminal. 
@@ -28,11 +28,17 @@ function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNu
     %   anatomicalPath: Path to anatomical image you want to process
     %   MNITemplate: You can find one in $FSLDIR/data/standard. use 1mm MNI
     %   use the _brain one. 
+    %   blur: Whether to use blur or not. Number of NA.
+    %   addSliceTime: Whether to run slice timing or not.
     %   skipPCA: Our multi-echo processing removes some noise. The
     %   literature is not solid whether additional PCA analysis is
     %   beneficial after this, so we leave this optional. AFNI examples do
     %   this operation though
-    %   combineMethod: Echo combination method, check AFNI for details
+    %   combineMethod: Echo combination method, check afni_proc.py for 
+    %   details
+    %   inputWarp: path to input warp. If you are processing data from the
+    %   same subject and session, no need to run the warp a second time. So
+    %   specify the output of the first run as an input here. 
     
     % Set up variables we will use 
     ventricles = fullfile(getenv('SUBJECTS_DIR'), subjectID, 'SUMA', 'fs_ap_latvent.nii.gz');
@@ -45,9 +51,8 @@ function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, runNu
     funcDir = funcDir(3:end, :);
 
     % Insert slice timing info from json to nifti
-    if addSliceTime
-        system(['abids_tool.py -add_slice_times -input ' funcDataset]);
-    end
+    fprintf('\nAdding slice time information to data. Do not stop the script now or your MRi images get corrupted.\n');
+    system(['abids_tool.py -add_slice_times -input ' funcDataset]);
 
     % Build and run the preprocessing setup. No blurring. If you need to
     % add it back. It needs to come after combine block. Also add the below
