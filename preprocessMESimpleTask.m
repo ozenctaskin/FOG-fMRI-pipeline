@@ -42,10 +42,10 @@ function warpSet = preprocessMESimpleTask(dataFolder, subjectID, sessionID, stim
     funcDatasetRun1 = fullfile(dataFolder, subjectID, sessionID, 'func', [subjectID '_' sessionID '_task-fingerTap_dir-PA_run-1_echo-*_part-mag_bold.nii.gz']);
     funcDatasetRun2 = fullfile(dataFolder, subjectID, sessionID, 'func', [subjectID '_' sessionID '_task-fingerTap_dir-PA_run-2_echo-*_part-mag_bold.nii.gz']);
 
-    % % Insert slice timing info from json to nifti
-    % fprintf('\nAdding slice time information to data. Do not stop the script now or your MRi images get corrupted.\n');
-    % system(['abids_tool.py -add_slice_times -input ' funcDatasetRun1]);
-    % system(['abids_tool.py -add_slice_times -input ' funcDatasetRun2]);
+    % Insert slice timing info from json to nifti
+    fprintf('\nAdding slice time information to data. Do not stop the script now or your MRi images get corrupted.\n');
+    system(['abids_tool.py -add_slice_times -input ' funcDatasetRun1]);
+    system(['abids_tool.py -add_slice_times -input ' funcDatasetRun2]);
 
     % Build and run the preprocessing setup. No blurring. If you need to
     % add it back. It needs to come after combine block. Also add the below
@@ -64,7 +64,8 @@ function warpSet = preprocessMESimpleTask(dataFolder, subjectID, sessionID, stim
     '-align_unifize_epi local ' ..., 
     '-align_opts_aea -cost lpc+ZZ -giant_move -check_flip ' ...,    
     '-tlrc_base ' MNITemplate ' ' ..., 
-    '-tlrc_NL_warp ' ...,    
+    '-tlrc_NL_warp ' ...,
+    '-tlrc_no_ss ' ...,
     '-volreg_align_to MIN_OUTLIER ' ...,
     '-volreg_align_e2a ' ..., 
     '-volreg_tlrc_warp ' ...,
