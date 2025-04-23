@@ -130,7 +130,7 @@ function warpSet = preprocessMESimpleTask(dataFolder, subjectID, sessionID, stim
     anat = fullfile(outputFolder, ['anat_final.' subjectID '+tlrc.HEAD']);
     system(['cd ' outputFolder ';' '3dAFNItoNIFTI -prefix beta ' func '''[tap#0_Coef]''']);
     system(['cd ' outputFolder ';' '3dAFNItoNIFTI -prefix tstat ' func '''[tap#0_Tstat]''']);
-    system(['cd ' outputFolder ';' '3dAFNItoNIFTI -prefix tstat ' func '''[tap_Fstat]''']);
+    system(['cd ' outputFolder ';' '3dAFNItoNIFTI -prefix fstat ' func '''[tap_Fstat]''']);
     system(['cd ' outputFolder ';' '3dAFNItoNIFTI -prefix final_anat ' anat]);
 
     % Return final anat and warps to be used for hte next run
