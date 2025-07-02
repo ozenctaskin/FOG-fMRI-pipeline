@@ -1,0 +1,868 @@
+# --------------------------------------------------------------------------------
+# This is a template bidsmap with the key-value mappings for the different BIDS
+# datatypes (anat, func, dwi, etc). The datatype attributes are the keys that map
+# onto the BIDS labels. The bidsmap data-structure should be 5 levels deep:
+#
+# dict       : dict     : list     : dict        : dict
+# dataformat : datatype : run-item : bidsmapping : mapping-data
+#
+# NB:
+# 1) This bidsmap is intended to be used by the bidsmapper for data discovery.
+#    Although generally not recommended, it can also be used directly by the bidscoiner
+# 2) This bidsmap is tailored to standard data acquisitions at the Donders Centre for
+#    Cognitive Neuroimaging (DCCN). You may consider (Institute) users may create their
+#    own bidsmap_[template].yaml or bidsmap_[sample].yaml file
+#
+# For more information, see: https://bidscoin.readthedocs.io
+# --------------------------------------------------------------------------------
+
+$schema: schema.json
+
+Options:
+# --------------------------------------------------------------------------------
+# General BIDScoin and plugin options
+# --------------------------------------------------------------------------------
+  bidscoin:
+    version: 4.3.2                  # BIDScoin version (should correspond with the version in pyproject.toml)
+    subprefix: sub-                 # The subject prefix of the source data
+    sesprefix: ses-                 # The session prefix of the source data
+    bidsignore:                                    # List of entries that are added to the .bidsignore file (for more info, see BIDS specifications), e.g. [extra_data/, pet/, myfile.txt, yourfile.csv]
+    - mrs/
+    - sub-*_ct.*
+    - extra_data/
+    unknowntypes:                   # A list of datatypes that are converted to BIDS-like datatype folders
+    - mrs
+    - extra_data
+    ignoretypes:                    # A list of datatypes that are excluded / not converted to BIDS
+    - exclude
+    notderivative: []               # A list of suffixes that should not be considered as a derivative datatype
+    unzip: RC*                      # Wildcard pattern to select tarball/zip-files in the source folders that need to be unzipped (in a tempdir) to expose the data, e.g. '*.tar.gz'
+  plugins:                          # List of plugins with plugin-specific key-value pairs (that can be used by the plugin)
+    dcm2niix2bids:                  # See dcm2niix -h and https://www.nitrc.org/plugins/mwiki/index.php/dcm2nii:MainPage#General_Usage for more info
+      command: dcm2niix             # Command to run dcm2niix, e.g. "module add dcm2niix/1.0.20180622; dcm2niix" or "PATH=/opt/dcm2niix/bin:$PATH; dcm2niix" or /opt/dcm2niix/bin/dcm2niix or 'C:\"Program Files"\dcm2niix\dcm2niix.exe' (use quotes to deal with whitespaces in the path)
+      args: -b y -z y -i n -l n     # Argument string that is passed to dcm2niix. Tip: SPM users may want to use '-z n' (which produces unzipped NIfTI's, see dcm2niix -h for more information)
+      anon: y                       # Set this anonymization flag to 'y' to round off age and discard acquisition date from the meta data
+      meta: [.json, .tsv, .tsv.gz]  # The file extensions of the equally named metadata sourcefiles that are copied over to the BIDS sidecar files
+      fallback: y                   # Appends unhandled dcm2niix suffixes to the `acq` label if 'y' (recommended, else the suffix data is discarded)
+
+
+DICOM:
+# --------------------------------------------------------------------------------
+# DICOM key-value heuristics (DICOM fields that are mapped to the BIDS labels)
+# --------------------------------------------------------------------------------
+  subject: <<filepath:/raw/sub-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as subject-label, e.g. <PatientID>
+  session: <<filepath:/raw/sub-.*?/ses-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as session-label, e.g. <StudyID>
+
+  anat:       # ----------------------- All anatomical runs --------------------
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/005-bto_MPRAGE_2x1_1mm_iso/1.3.12.2.1107.5.2.43.166247.30000025060215023502400000298.dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      ProtocolName: bto_MPRAGE_2x1_1mm_iso
+      MRAcquisitionType: 3D
+      Modality: MR
+      SeriesDescription: bto_MPRAGE_2x1_1mm_iso
+      ImageType: "['ORIGINAL', 'PRIMARY', 'M', 'NORM', 'DIS2D', 'MFSPLIT']"
+      SequenceName: .tfl3d1_16ns
+      PulseSequenceName: ''
+      SequenceVariant: SK
+      ScanningSequence: GR
+      EchoPulseSequence: ''
+      SliceThickness: '1'
+      FlipAngle: '9'
+      EchoNumbers: ''
+      EchoTime: '2.88'
+      EffectiveEchoTime: ''
+      RepetitionTime: '2100'
+      InPlanePhaseEncodingDirection: ROW
+    bids:
+      task: null
+      acq: btoMPRAGE2x11mmiso
+      ce: null
+      rec: null
+      run: <<>>
+      echo: null
+      part: ['', mag, phase, real, imag, 0]   # This BIDS value list will be shown as a dropdown menu in the bidseditor with the first (empty) item selected (as indicated by the last item, i.e. 0)
+      chunk: null
+      suffix: T1w
+    meta: {}
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/008-bto_SPACE-T2_2x2_CAIPI_1mm_iso/1.3.12.2.1107.5.2.43.166247.30000025060215023502400001843.dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      ProtocolName: bto_SPACE-T2_2x2_CAIPI_1mm_iso
+      SequenceVariant: "['SP', 'SK']"
+      Modality: MR
+      SeriesDescription: bto_SPACE-T2_2x2_CAIPI_1mm_iso
+      ImageType: "['ORIGINAL', 'PRIMARY', 'M', 'NORM', 'DIS3D', 'MFSPLIT']"
+      SequenceName: .spcR_282ns
+      PulseSequenceName: ''
+      ScanningSequence: SE
+      EchoPulseSequence: ''
+      MRAcquisitionType: 3D
+      SliceThickness: '1'
+      FlipAngle: '120'
+      EchoNumbers: ''
+      EchoTime: '408'
+      EffectiveEchoTime: ''
+      RepetitionTime: '3200'
+      InPlanePhaseEncodingDirection: ROW
+    bids:
+      suffix: T2w
+      task: null
+      acq: btoSPACET22x2CAIPI1mmiso
+      ce: null
+      rec: null
+      run: <<>>
+      echo: null
+      part: ['', mag, phase, real, imag, 0]   # This BIDS value list will be shown as a dropdown menu in the bidseditor with the first (empty) item selected (as indicated by the last item, i.e. 0)
+      chunk: null
+    meta: {}
+  func:       # ----------------------- All functional runs --------------------
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/005-bto_CMRR_EP2D_ME-BOLD_2x4_2p5mm_iso_rsfMRI_SBRef/Image
+      (0001).dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      SeriesDescription: bto_CMRR_EP2D_ME-BOLD_2x4_2p5mm_iso_rsfMRI_SBRef
+      Modality: MR
+      ProtocolName: bto_CMRR_EP2D_ME-BOLD_2x4_2p5mm_iso_rsfMRI
+      ImageType: "['ORIGINAL', 'PRIMARY', 'FMRI', 'NONE']"
+      SequenceName: ''
+      PulseSequenceName: epfid2d3_88
+      SequenceVariant: ''
+      ScanningSequence: ''
+      EchoPulseSequence: GRADIENT
+      MRAcquisitionType: 2D
+      SliceThickness: '2.5'
+      FlipAngle: '60'
+      EchoNumbers: ''
+      EchoTime: ''
+      EffectiveEchoTime: '13.200000000000001'
+      RepetitionTime: '1500'
+      PhaseEncodingDirection: ''
+    bids:
+      suffix: sbref
+      task: btoCMRREP2DMEBOLD2x42p5mmisorsfMRI
+      acq: null
+      ce: null
+      dir: ''
+      rec: null
+      run: <<>>
+      echo: null
+      part: ['', mag, phase, real, imag, 0]
+      chunk: null
+    meta:
+      TaskName: bto_CMRR_EP2D_ME-BOLD_2x4_2p5mm_iso_rsfMRI
+      B0FieldSource: null
+      B0FieldIdentifier: null
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/006-bto_CMRR_EP2D_ME-BOLD_2x4_2p5mm_iso_rsfMRI/Image
+      (0001).dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      ProtocolName: bto_CMRR_EP2D_ME-BOLD_2x4_2p5mm_iso_rsfMRI
+      Modality: MR
+      SeriesDescription: bto_CMRR_EP2D_ME-BOLD_2x4_2p5mm_iso_rsfMRI
+      ImageType: "['ORIGINAL', 'PRIMARY', 'FMRI', 'NONE']"
+      SequenceName: ''
+      PulseSequenceName: epfid2d3_88
+      SequenceVariant: ''
+      ScanningSequence: ''
+      EchoPulseSequence: GRADIENT
+      MRAcquisitionType: 2D
+      SliceThickness: '2.5'
+      FlipAngle: '60'
+      EchoNumbers: ''
+      EchoTime: ''
+      EffectiveEchoTime: '13.200000000000001'
+      RepetitionTime: '1500'
+      PhaseEncodingDirection: ''
+    bids:
+      task: btoCMRREP2DMEBOLD2x42p5mmisorsfMRI
+      acq: null
+      ce: null
+      dir: ''
+      rec: null
+      run: <<>>
+      echo: null
+      part: ['', mag, phase, real, imag, 0]
+      chunk: null
+      suffix: bold
+    meta:
+      TaskName: bto_CMRR_EP2D_ME-BOLD_2x4_2p5mm_iso_rsfMRI
+      B0FieldSource: null
+      B0FieldIdentifier: null
+  perf:       # ----------------------- All perfusion runs ---------------------
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/011-bto_advTGSE_2p5_iso_2x2_s1_pCASL/Image
+      (0001).dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      ProtocolName: bto_advTGSE_2p5_iso_2x2_s1_pCASL
+      Modality: MR
+      SeriesDescription: bto_advTGSE_2p5_iso_2x2_s1_pCASL
+      ImageType: "['ORIGINAL', 'PRIMARY', 'ASL', 'NONE']"
+      SequenceName: ''
+      PulseSequenceName: WIPtgse3d1_680
+      SequenceVariant: ''
+      ScanningSequence: ''
+      EchoPulseSequence: GRADIENT
+      MRAcquisitionType: 3D
+      SliceThickness: '2.5'
+      FlipAngle: '180'
+      EchoNumbers: ''
+      EchoTime: ''
+      EffectiveEchoTime: '12.700000000000001'
+      RepetitionTime: '4000'
+      PhaseEncodingDirection: ''
+    bids:
+      acq: btoadvTGSE2p5iso2x2s1pC
+      rec: btoadvTGSE2p5iso2x2s1pC
+      dir: ''
+      run: <<>>
+      suffix: asl
+    meta:
+      ArterialSpinLabelingType: CASL / PCASL / PASL
+      PostLabelingDelay: null
+      BackgroundSuppression: null
+      M0Type: Separate / Included / Estimate / Absent
+      RepetitionTimePreparation: null
+      VascularCrushing: null
+      AcquisitionVoxelSize: null
+      B0FieldSource: null
+      B0FieldIdentifier: null
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/014-bto_advTGSE_2p5_iso_2x2_s1_MZero/Image
+      (0001).dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      ProtocolName: bto_advTGSE_2p5_iso_2x2_s1_MZero
+      Modality: MR
+      SeriesDescription: bto_advTGSE_2p5_iso_2x2_s1_MZero
+      ImageType: "['ORIGINAL', 'PRIMARY', 'M', 'NONE']"
+      SequenceName: ''
+      PulseSequenceName: WIPtgse3d1_680
+      SequenceVariant: ''
+      ScanningSequence: ''
+      EchoPulseSequence: GRADIENT
+      MRAcquisitionType: 3D
+      SliceThickness: '2.5'
+      FlipAngle: '180'
+      EchoNumbers: ''
+      EchoTime: ''
+      EffectiveEchoTime: '12.700000000000001'
+      RepetitionTime: '16000'
+      PhaseEncodingDirection: ''
+    bids:
+      suffix: m0scan
+      acq: btoadvTGSE2p5iso2x2s1MZero
+      rec: btoadvTGSE2p5iso2x2s1MZero
+      dir: ''
+      run: <<>>
+    meta:
+      ArterialSpinLabelingType: CASL / PCASL / PASL
+      PostLabelingDelay: null
+      BackgroundSuppression: null
+      M0Type: Separate / Included / Estimate / Absent
+      RepetitionTimePreparation: null
+      VascularCrushing: null
+      AcquisitionVoxelSize: null
+      B0FieldSource: null
+      B0FieldIdentifier: null
+  dwi:     [] # ----------------------- All diffusion runs ---------------------
+  fmap:       # ----------------------- All fieldmap runs ----------------------
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/008-bto_CMRR_EP2D_ME-BOLD_2x4_2p5mm_iso_rsfMRI_AP_SBRef/Image
+      (0001).dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      ProtocolName: bto_CMRR_EP2D_ME-BOLD_2x4_2p5mm_iso_rsfMRI_AP
+      ScanningSequence: ''
+      Modality: MR
+      SeriesDescription: bto_CMRR_EP2D_ME-BOLD_2x4_2p5mm_iso_rsfMRI_AP_SBRef
+      ImageType: "['ORIGINAL', 'PRIMARY', 'FMRI', 'NONE']"
+      SequenceName: ''
+      PulseSequenceName: epfid2d3_88
+      SequenceVariant: ''
+      EchoPulseSequence: GRADIENT
+      MRAcquisitionType: 2D
+      SliceThickness: '2.5'
+      FlipAngle: '60'
+      EchoNumbers: ''
+      EchoTime: ''
+      EffectiveEchoTime: '13.200000000000001'
+      RepetitionTime: '1500'
+      PhaseEncodingDirection: ''
+    bids:
+      acq: btoCMRREP2DMEBOLD2x42p5mmisorsfMRIAPSBRef
+      ce: null
+      dir: AP
+      run: <<>>
+      chunk: null
+      suffix: epi
+    meta:
+      B0FieldIdentifier: null
+      IntendedFor: null
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/015-bto_advTGSE_2p5_iso_2x2_s1_MZero_oPE/Image
+      (0001).dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      Modality: MR
+      ProtocolName: bto_advTGSE_2p5_iso_2x2_s1_MZero_oPE
+      SeriesDescription: bto_advTGSE_2p5_iso_2x2_s1_MZero_oPE
+      ImageType: "['ORIGINAL', 'PRIMARY', 'M', 'NONE']"
+      SequenceName: ''
+      PulseSequenceName: WIPtgse3d1_680
+      SequenceVariant: ''
+      ScanningSequence: ''
+      EchoPulseSequence: GRADIENT
+      MRAcquisitionType: 3D
+      SliceThickness: '2.5'
+      FlipAngle: '180'
+      EchoNumbers: ''
+      EchoTime: ''
+      EffectiveEchoTime: '12.700000000000001'
+      RepetitionTime: '16000'
+      PhaseEncodingDirection: ''
+    bids:
+      suffix: m0scan
+      acq: btoadvTGSE2p5iso2x2s1MZerooPE
+      ce: null
+      dir: AP
+      run: <<>>
+      chunk: null
+    meta:
+      B0FieldIdentifier: null
+      IntendedFor: null
+  pet:     [] # ----------------------- All PET runs ---------------------------
+  eeg:     [] # ----------------------- All EEG data ---------------------------
+  ieeg:     [] # ----------------------- All iEEG data --------------------------
+  extra_data:     [] # ----------------------- All extra data -------------------------
+  exclude:    # ----------------------- Data that will be left out -------------
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/001-AAHead
+      Scout/1.3.12.2.1107.5.2.43.166247.30000025060215023502400000008.dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      ProtocolName: AAHead Scout
+      Modality: MR
+      SeriesDescription: AAHead Scout
+      ImageType: "['ORIGINAL', 'PRIMARY', 'M', 'NORM', 'DIS2D', 'MFSPLIT']"
+      SequenceName: .fl3d1_ns
+      PulseSequenceName: ''
+      SequenceVariant: SK
+      ScanningSequence: GR
+      MRAcquisitionType: 3D
+      SliceThickness: '1.6'
+      FlipAngle: '8'
+      EchoNumbers: ''
+      EchoTime: '1.37'
+      EffectiveEchoTime: ''
+      RepetitionTime: '3.15'
+      InPlanePhaseEncodingDirection: ROW
+    bids:
+      acq: AAHeadScout
+      task: AAHeadScout
+      echo: ''
+      suffix: GR
+    meta: {}
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/002-AAHead
+      Scout_MPR_sag/1.3.12.2.1107.5.2.43.166247.30000025060215023502400000267.dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      ProtocolName: AAHead Scout
+      Modality: MR
+      SeriesDescription: AAHead Scout_MPR_sag
+      ImageType: "['DERIVED', 'PRIMARY', 'MPR', 'NORM', 'DIS2D', 'MFSPLIT']"
+      SequenceName: .fl3d1_ns
+      PulseSequenceName: ''
+      SequenceVariant: SK
+      ScanningSequence: GR
+      MRAcquisitionType: 3D
+      SliceThickness: '1.6'
+      FlipAngle: '8'
+      EchoNumbers: ''
+      EchoTime: '1.37'
+      EffectiveEchoTime: ''
+      RepetitionTime: '3.15'
+      InPlanePhaseEncodingDirection: OTHER
+    bids:
+      acq: AAHeadScout
+      task: AAHeadScoutMPRsag
+      echo: ''
+      suffix: GR
+    meta: {}
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/003-AAHead
+      Scout_MPR_cor/1.3.12.2.1107.5.2.43.166247.30000025060215023502400000280.dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      ProtocolName: AAHead Scout
+      Modality: MR
+      SeriesDescription: AAHead Scout_MPR_cor
+      ImageType: "['DERIVED', 'PRIMARY', 'MPR', 'NORM', 'DIS2D', 'MFSPLIT']"
+      SequenceName: .fl3d1_ns
+      PulseSequenceName: ''
+      SequenceVariant: SK
+      ScanningSequence: GR
+      MRAcquisitionType: 3D
+      SliceThickness: '1.6'
+      FlipAngle: '8'
+      EchoNumbers: ''
+      EchoTime: '1.37'
+      EffectiveEchoTime: ''
+      RepetitionTime: '3.15'
+      InPlanePhaseEncodingDirection: OTHER
+    bids:
+      acq: AAHeadScout
+      task: AAHeadScoutMPRcor
+      echo: ''
+      suffix: GR
+    meta: {}
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/004-AAHead
+      Scout_MPR_tra/1.3.12.2.1107.5.2.43.166247.30000025060215023502400000289.dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      ProtocolName: AAHead Scout
+      Modality: MR
+      SeriesDescription: AAHead Scout_MPR_tra
+      ImageType: "['DERIVED', 'PRIMARY', 'MPR', 'NORM', 'DIS2D', 'MFSPLIT']"
+      SequenceName: .fl3d1_ns
+      PulseSequenceName: ''
+      SequenceVariant: SK
+      ScanningSequence: GR
+      MRAcquisitionType: 3D
+      SliceThickness: '1.6'
+      FlipAngle: '8'
+      EchoNumbers: ''
+      EchoTime: '1.37'
+      EffectiveEchoTime: ''
+      RepetitionTime: '3.15'
+      InPlanePhaseEncodingDirection: OTHER
+    bids:
+      acq: AAHeadScout
+      task: AAHeadScoutMPRtra
+      echo: ''
+      suffix: GR
+    meta: {}
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/006-bto_MPRAGE_2x1_1mm_iso_MPR_Tra/1.3.12.2.1107.5.2.43.166247.30000025060215023502400000813.dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      ImageType: "['DERIVED', 'PRIMARY', 'MPR', 'NORM', 'DIS2D', 'MFSPLIT']"
+      ProtocolName: bto_MPRAGE_2x1_1mm_iso
+      Modality: MR
+      SeriesDescription: bto_MPRAGE_2x1_1mm_iso_MPR_Tra
+      SequenceName: .tfl3d1_16ns
+      PulseSequenceName: ''
+      SequenceVariant: SK
+      ScanningSequence: GR
+      MRAcquisitionType: 3D
+      SliceThickness: '1'
+      FlipAngle: '9'
+      EchoNumbers: ''
+      EchoTime: '2.88'
+      EffectiveEchoTime: ''
+      RepetitionTime: '2100'
+      InPlanePhaseEncodingDirection: OTHER
+    bids:
+      rec: DERIVED
+      acq: btoMPRAGE2x11mmiso
+      task: btoMPRAGE2x11mmisoMPRTra
+      echo: ''
+      suffix: GR
+    meta: {}
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/009-bto_SPACE-T2_2x2_CAIPI_1mm_iso_MPR_Tra/1.3.12.2.1107.5.2.43.166247.30000025060215023502400002358.dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      ImageType: "['DERIVED', 'PRIMARY', 'MPR', 'NORM', 'DIS3D', 'MFSPLIT']"
+      ProtocolName: bto_SPACE-T2_2x2_CAIPI_1mm_iso
+      Modality: MR
+      SeriesDescription: bto_SPACE-T2_2x2_CAIPI_1mm_iso_MPR_Tra
+      SequenceName: .spcR_282ns
+      PulseSequenceName: ''
+      SequenceVariant: "['SP', 'SK']"
+      ScanningSequence: SE
+      MRAcquisitionType: 3D
+      SliceThickness: '1'
+      FlipAngle: '120'
+      EchoNumbers: ''
+      EchoTime: '408'
+      EffectiveEchoTime: ''
+      RepetitionTime: '3200'
+      InPlanePhaseEncodingDirection: OTHER
+    bids:
+      rec: DERIVED
+      acq: btoSPACET22x2CAIPI1mmiso
+      task: btoSPACET22x2CAIPI1mmisoMPRTra
+      echo: ''
+      suffix: SE
+    meta: {}
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/012-Perfusion_Weighted/Image
+      (0001).dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      ImageType: "['DERIVED', 'PRIMARY', 'ASL', 'SUBTRACTION']"
+      ProtocolName: bto_advTGSE_2p5_iso_2x2_s1_pCASL
+      Modality: MR
+      SeriesDescription: Perfusion_Weighted
+      SequenceName: ''
+      PulseSequenceName: WIPtgse3d1_680
+      SequenceVariant: ''
+      ScanningSequence: ''
+      MRAcquisitionType: 3D
+      SliceThickness: '2.5'
+      FlipAngle: '180'
+      EchoNumbers: ''
+      EchoTime: ''
+      EffectiveEchoTime: '12.700000000000001'
+      RepetitionTime: '4000'
+      InPlanePhaseEncodingDirection: COLUMN
+    bids:
+      rec: DERIVED
+      acq: btoadvTGSE2p5iso2x2s1pCASL
+      task: PerfusionWeighted
+      echo: ''
+      suffix: ''
+    meta: {}
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/013-relCBF/Image
+      (0001).dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      ImageType: "['DERIVED', 'PRIMARY', 'ASL', 'RCBF']"
+      ProtocolName: bto_advTGSE_2p5_iso_2x2_s1_pCASL
+      Modality: MR
+      SeriesDescription: relCBF
+      SequenceName: ''
+      PulseSequenceName: WIPtgse3d1_680
+      SequenceVariant: ''
+      ScanningSequence: ''
+      MRAcquisitionType: 3D
+      SliceThickness: '2.5'
+      FlipAngle: '180'
+      EchoNumbers: ''
+      EchoTime: ''
+      EffectiveEchoTime: '12.700000000000001'
+      RepetitionTime: '4000'
+      InPlanePhaseEncodingDirection: COLUMN
+    bids:
+      rec: DERIVED
+      acq: btoadvTGSE2p5iso2x2s1pCASL
+      task: relCBF
+      echo: ''
+      suffix: ''
+    meta: {}
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/016-AAHead
+      Scout/Image (0001).dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      ProtocolName: AAHead Scout
+      Modality: MR
+      SeriesDescription: AAHead Scout
+      ImageType: "['ORIGINAL', 'PRIMARY', 'M', 'NONE']"
+      SequenceName: ''
+      PulseSequenceName: .fl3d1_ns
+      SequenceVariant: ''
+      ScanningSequence: ''
+      MRAcquisitionType: 3D
+      SliceThickness: '1.6'
+      FlipAngle: '8'
+      EchoNumbers: ''
+      EchoTime: ''
+      EffectiveEchoTime: '1.37'
+      RepetitionTime: '3.15'
+      InPlanePhaseEncodingDirection: ROW
+    bids:
+      acq: AAHeadScout
+      task: AAHeadScout
+      echo: ''
+      suffix: ''
+    meta: {}
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/017-AAHead
+      Scout_MPR_sag/Image (0001).dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      ProtocolName: AAHead Scout
+      Modality: MR
+      SeriesDescription: AAHead Scout_MPR_sag
+      ImageType: "['DERIVED', 'PRIMARY', 'MPR', 'RESAMPLED']"
+      SequenceName: ''
+      PulseSequenceName: .fl3d1_ns
+      SequenceVariant: ''
+      ScanningSequence: ''
+      MRAcquisitionType: 3D
+      SliceThickness: '1.6'
+      FlipAngle: '8'
+      EchoNumbers: ''
+      EchoTime: ''
+      EffectiveEchoTime: '1.37'
+      RepetitionTime: '3.15'
+      InPlanePhaseEncodingDirection: OTHER
+    bids:
+      acq: AAHeadScout
+      task: AAHeadScoutMPRsag
+      echo: ''
+      suffix: ''
+    meta: {}
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/018-AAHead
+      Scout_MPR_cor/Image (0001).dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      ProtocolName: AAHead Scout
+      Modality: MR
+      SeriesDescription: AAHead Scout_MPR_cor
+      ImageType: "['DERIVED', 'PRIMARY', 'MPR', 'RESAMPLED']"
+      SequenceName: ''
+      PulseSequenceName: .fl3d1_ns
+      SequenceVariant: ''
+      ScanningSequence: ''
+      MRAcquisitionType: 3D
+      SliceThickness: '1.6'
+      FlipAngle: '8'
+      EchoNumbers: ''
+      EchoTime: ''
+      EffectiveEchoTime: '1.37'
+      RepetitionTime: '3.15'
+      InPlanePhaseEncodingDirection: OTHER
+    bids:
+      acq: AAHeadScout
+      task: AAHeadScoutMPRcor
+      echo: ''
+      suffix: ''
+    meta: {}
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/019-AAHead
+      Scout_MPR_tra/Image (0001).dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      ProtocolName: AAHead Scout
+      Modality: MR
+      SeriesDescription: AAHead Scout_MPR_tra
+      ImageType: "['DERIVED', 'PRIMARY', 'MPR', 'RESAMPLED']"
+      SequenceName: ''
+      PulseSequenceName: .fl3d1_ns
+      SequenceVariant: ''
+      ScanningSequence: ''
+      MRAcquisitionType: 3D
+      SliceThickness: '1.6'
+      FlipAngle: '8'
+      EchoNumbers: ''
+      EchoTime: ''
+      EffectiveEchoTime: '1.37'
+      RepetitionTime: '3.15'
+      InPlanePhaseEncodingDirection: OTHER
+    bids:
+      acq: AAHeadScout
+      task: AAHeadScoutMPRtra
+      echo: ''
+      suffix: ''
+    meta: {}
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/007-bto_SPACE-T2_2x2_CAIPI_1mm_iso_ND/1.3.12.2.1107.5.2.43.166247.30000025060215023502400001328.dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      Modality: MR
+      ProtocolName: bto_SPACE-T2_2x2_CAIPI_1mm_iso
+      SeriesDescription: bto_SPACE-T2_2x2_CAIPI_1mm_iso_ND
+      ImageType: "['ORIGINAL', 'PRIMARY', 'M', 'ND', 'NORM', 'MFSPLIT']"
+      SequenceName: .spcR_282ns
+      PulseSequenceName: ''
+      SequenceVariant: "['SP', 'SK']"
+      ScanningSequence: SE
+      MRAcquisitionType: 3D
+      SliceThickness: '1'
+      FlipAngle: '120'
+      EchoNumbers: ''
+      EchoTime: '408'
+      EffectiveEchoTime: ''
+      RepetitionTime: '3200'
+      InPlanePhaseEncodingDirection: ROW
+    bids:
+      acq: btoSPACET22x2CAIPI1mmiso
+      task: btoSPACET22x2CAIPI1mmisoND
+      echo: ''
+      suffix: SE
+    meta: {}
+  - provenance: 
+      /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/009-bto_CMRR_EP2D_ME-BOLD_2x4_2p5mm_iso_rsfMRI_AP/Image
+      (0001).dcm
+    properties:
+      filepath: ''
+      filename: ''
+      filesize: ''
+      nrfiles: null
+    attributes:
+      Modality: MR
+      ProtocolName: bto_CMRR_EP2D_ME-BOLD_2x4_2p5mm_iso_rsfMRI_AP
+      SeriesDescription: bto_CMRR_EP2D_ME-BOLD_2x4_2p5mm_iso_rsfMRI_AP
+      ImageType: "['ORIGINAL', 'PRIMARY', 'FMRI', 'NONE']"
+      SequenceName: ''
+      PulseSequenceName: epfid2d3_88
+      SequenceVariant: ''
+      ScanningSequence: ''
+      MRAcquisitionType: 2D
+      SliceThickness: '2.5'
+      FlipAngle: '60'
+      EchoNumbers: ''
+      EchoTime: ''
+      EffectiveEchoTime: '13.200000000000001'
+      RepetitionTime: '1500'
+      InPlanePhaseEncodingDirection: COLUMN
+    bids:
+      acq: btoCMRREP2DMEBOLD2x42p5mmisorsfMRIAP
+      task: btoCMRREP2DMEBOLD2x42p5mmisorsfMRIAP
+      echo: ''
+      suffix: bold
+    meta: {}
+PAR:
+# --------------------------------------------------------------------------------
+# PAR key-value heuristics (Philips PAR fields that are mapped to the BIDS labels)
+# --------------------------------------------------------------------------------
+  subject: <<filepath:/raw/sub-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as subject-label, e.g. <PatientID>
+  session: <<filepath:/raw/sub-.*?/ses-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as session-label, e.g. <StudyID>
+
+  anat:     [] # ----------------------- All anatomical runs --------------------
+  func:     [] # ----------------------- All functional runs --------------------
+  perf:     [] # ----------------------- All perfusion runs ---------------------
+  dwi:     [] # ----------------------- All diffusion runs ---------------------
+  fmap:     [] # ----------------------- All fieldmap runs ----------------------
+  extra_data:     [] # ----------------------- All extra data -------------------------
+  exclude:     [] # ----------------------- Data that will be left out -------------
+SPAR:
+# ---------------------------------------------------------------------------------
+# SPAR key-value heuristics (Philips MRS fields that are mapped to the BIDS labels)
+# ---------------------------------------------------------------------------------
+  subject: <<filepath:/raw/sub-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as subject-label, e.g. <PatientID>
+  session: <<filepath:/raw/sub-.*?/ses-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as session-label, e.g. <StudyID>
+
+  mrs:     [] # ---------------------- All spectroscopy runs ------------------
+  extra_data:     [] # ----------------------- All extra data -------------------------
+  exclude:     [] # ----------------------- Data that will be left out -------------
+Twix:
+# ---------------------------------------------------------------------------------
+# Twix key-value heuristics (Siemens MRS fields that are mapped to the BIDS labels)
+# ---------------------------------------------------------------------------------
+  subject: <<filepath:/raw/sub-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as subject-label, e.g. <PatientID>
+  session: <<filepath:/raw/sub-.*?/ses-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as session-label, e.g. <StudyID>
+
+  mrs:     [] # ---------------------- All spectroscopy runs ------------------
+  extra_data:     [] # ----------------------- All extra data -------------------------
+  exclude:     [] # ----------------------- Data that will be left out -------------
+Pfile:
+# ------------------------------------------------------------------------------
+# P-file key-value heuristics (GE MRS fields that are mapped to the BIDS labels)
+# ------------------------------------------------------------------------------
+  subject: <<filepath:/raw/sub-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as subject-label, e.g. <PatientID>
+  session: <<filepath:/raw/sub-.*?/ses-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as session-label, e.g. <StudyID>
+
+  mrs:     [] # ---------------------- All spectroscopy runs ------------------
+  extra_data:     [] # ----------------------- All extra data -------------------------
+  exclude:     [] # ----------------------- Data that will be left out -------------
+Nibabel:
+# --------------------------------------------------------------------------------
+# Nibabel key-value heuristics (header fields that are mapped to the BIDS labels)
+# --------------------------------------------------------------------------------
+  subject: <<filepath:/raw/sub-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as subject-label, e.g. <PatientID>
+  session: <<filepath:/raw/sub-.*?/ses-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as session-label, e.g. <StudyID>
+
+  anat:     [] # ----------------------- All anatomical runs --------------------
+  func:     [] # ----------------------- All functional runs --------------------
+  perf:     [] # ----------------------- All perfusion runs ---------------------
+  dwi:     [] # ----------------------- All diffusion runs ---------------------
+  fmap:     [] # ----------------------- All fieldmap runs ----------------------
+  extra_data:     [] # ----------------------- All extra data -------------------------
+  exclude:     [] # ----------------------- Data that will be left out -------------
