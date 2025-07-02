@@ -27,12 +27,12 @@ Options:
     subprefix: sub-                 # The subject prefix of the source data
     sesprefix: ses-                 # The session prefix of the source data
     bidsignore:                                    # List of entries that are added to the .bidsignore file (for more info, see BIDS specifications), e.g. [extra_data/, pet/, myfile.txt, yourfile.csv]
-    - extra_data/
     - mrs/
     - sub-*_ct.*
+    - extra_data/
     unknowntypes:                   # A list of datatypes that are converted to BIDS-like datatype folders
-    - extra_data
     - mrs
+    - extra_data
     ignoretypes:                    # A list of datatypes that are excluded / not converted to BIDS
     - exclude
     notderivative: []               # A list of suffixes that should not be considered as a derivative datatype
@@ -158,7 +158,7 @@ DICOM:
       task: btoCMRREP2DMEBOLD2x42p5mmisorsfMRI
       acq: null
       ce: null
-      dir: ''
+      dir: PA
       rec: null
       run: <<>>
       echo: null
@@ -198,7 +198,7 @@ DICOM:
       task: btoCMRREP2DMEBOLD2x42p5mmisorsfMRI
       acq: null
       ce: null
-      dir: ''
+      dir: PA
       rec: null
       run: <<>>
       echo: null
