@@ -27,12 +27,12 @@ Options:
     subprefix: sub-                 # The subject prefix of the source data
     sesprefix: ses-                 # The session prefix of the source data
     bidsignore:                                    # List of entries that are added to the .bidsignore file (for more info, see BIDS specifications), e.g. [extra_data/, pet/, myfile.txt, yourfile.csv]
+    - extra_data/
     - mrs/
     - sub-*_ct.*
-    - extra_data/
     unknowntypes:                   # A list of datatypes that are converted to BIDS-like datatype folders
-    - mrs
     - extra_data
+    - mrs
     ignoretypes:                    # A list of datatypes that are excluded / not converted to BIDS
     - exclude
     notderivative: []               # A list of suffixes that should not be considered as a derivative datatype
@@ -294,7 +294,7 @@ DICOM:
       AcquisitionVoxelSize: null
       B0FieldSource: null
       B0FieldIdentifier: null
-  dwi:     [] # ----------------------- All diffusion runs ---------------------
+  dwi: []     # ----------------------- All diffusion runs ---------------------
   fmap:       # ----------------------- All fieldmap runs ----------------------
   - provenance: 
       /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/008-bto_CMRR_EP2D_ME-BOLD_2x4_2p5mm_iso_rsfMRI_AP_SBRef/Image
@@ -323,7 +323,7 @@ DICOM:
       RepetitionTime: '1500'
       PhaseEncodingDirection: ''
     bids:
-      acq: btoCMRREP2DMEBOLD2x42p5mmisorsfMRIAPSBRef
+      acq: ''
       ce: null
       dir: AP
       run: <<>>
@@ -368,10 +368,10 @@ DICOM:
     meta:
       B0FieldIdentifier: null
       IntendedFor: null
-  pet:     [] # ----------------------- All PET runs ---------------------------
-  eeg:     [] # ----------------------- All EEG data ---------------------------
-  ieeg:     [] # ----------------------- All iEEG data --------------------------
-  extra_data:     [] # ----------------------- All extra data -------------------------
+  pet: []     # ----------------------- All PET runs ---------------------------
+  eeg: []     # ----------------------- All EEG data ---------------------------
+  ieeg: []     # ----------------------- All iEEG data --------------------------
+  extra_data: []     # ----------------------- All extra data -------------------------
   exclude:    # ----------------------- Data that will be left out -------------
   - provenance: 
       /home/chenlab-linux/Desktop/test/bids/code/bidscoin/provenance/test/raw/sub-01/ses-01/001-AAHead
@@ -815,13 +815,13 @@ PAR:
   subject: <<filepath:/raw/sub-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as subject-label, e.g. <PatientID>
   session: <<filepath:/raw/sub-.*?/ses-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as session-label, e.g. <StudyID>
 
-  anat:     [] # ----------------------- All anatomical runs --------------------
-  func:     [] # ----------------------- All functional runs --------------------
-  perf:     [] # ----------------------- All perfusion runs ---------------------
-  dwi:     [] # ----------------------- All diffusion runs ---------------------
-  fmap:     [] # ----------------------- All fieldmap runs ----------------------
-  extra_data:     [] # ----------------------- All extra data -------------------------
-  exclude:     [] # ----------------------- Data that will be left out -------------
+  anat: []     # ----------------------- All anatomical runs --------------------
+  func: []     # ----------------------- All functional runs --------------------
+  perf: []     # ----------------------- All perfusion runs ---------------------
+  dwi: []     # ----------------------- All diffusion runs ---------------------
+  fmap: []     # ----------------------- All fieldmap runs ----------------------
+  extra_data: []     # ----------------------- All extra data -------------------------
+  exclude: []     # ----------------------- Data that will be left out -------------
 SPAR:
 # ---------------------------------------------------------------------------------
 # SPAR key-value heuristics (Philips MRS fields that are mapped to the BIDS labels)
@@ -829,9 +829,9 @@ SPAR:
   subject: <<filepath:/raw/sub-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as subject-label, e.g. <PatientID>
   session: <<filepath:/raw/sub-.*?/ses-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as session-label, e.g. <StudyID>
 
-  mrs:     [] # ---------------------- All spectroscopy runs ------------------
-  extra_data:     [] # ----------------------- All extra data -------------------------
-  exclude:     [] # ----------------------- Data that will be left out -------------
+  mrs: []     # ---------------------- All spectroscopy runs ------------------
+  extra_data: []     # ----------------------- All extra data -------------------------
+  exclude: []     # ----------------------- Data that will be left out -------------
 Twix:
 # ---------------------------------------------------------------------------------
 # Twix key-value heuristics (Siemens MRS fields that are mapped to the BIDS labels)
@@ -839,9 +839,9 @@ Twix:
   subject: <<filepath:/raw/sub-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as subject-label, e.g. <PatientID>
   session: <<filepath:/raw/sub-.*?/ses-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as session-label, e.g. <StudyID>
 
-  mrs:     [] # ---------------------- All spectroscopy runs ------------------
-  extra_data:     [] # ----------------------- All extra data -------------------------
-  exclude:     [] # ----------------------- Data that will be left out -------------
+  mrs: []     # ---------------------- All spectroscopy runs ------------------
+  extra_data: []     # ----------------------- All extra data -------------------------
+  exclude: []     # ----------------------- Data that will be left out -------------
 Pfile:
 # ------------------------------------------------------------------------------
 # P-file key-value heuristics (GE MRS fields that are mapped to the BIDS labels)
@@ -849,9 +849,9 @@ Pfile:
   subject: <<filepath:/raw/sub-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as subject-label, e.g. <PatientID>
   session: <<filepath:/raw/sub-.*?/ses-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as session-label, e.g. <StudyID>
 
-  mrs:     [] # ---------------------- All spectroscopy runs ------------------
-  extra_data:     [] # ----------------------- All extra data -------------------------
-  exclude:     [] # ----------------------- Data that will be left out -------------
+  mrs: []     # ---------------------- All spectroscopy runs ------------------
+  extra_data: []     # ----------------------- All extra data -------------------------
+  exclude: []     # ----------------------- Data that will be left out -------------
 Nibabel:
 # --------------------------------------------------------------------------------
 # Nibabel key-value heuristics (header fields that are mapped to the BIDS labels)
@@ -859,10 +859,10 @@ Nibabel:
   subject: <<filepath:/raw/sub-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as subject-label, e.g. <PatientID>
   session: <<filepath:/raw/sub-.*?/ses-(.*?)/>> # This filesystem property extracts the subject label from the source directory. NB: Any property or attribute can be used as session-label, e.g. <StudyID>
 
-  anat:     [] # ----------------------- All anatomical runs --------------------
-  func:     [] # ----------------------- All functional runs --------------------
-  perf:     [] # ----------------------- All perfusion runs ---------------------
-  dwi:     [] # ----------------------- All diffusion runs ---------------------
-  fmap:     [] # ----------------------- All fieldmap runs ----------------------
-  extra_data:     [] # ----------------------- All extra data -------------------------
-  exclude:     [] # ----------------------- Data that will be left out -------------
+  anat: []     # ----------------------- All anatomical runs --------------------
+  func: []     # ----------------------- All functional runs --------------------
+  perf: []     # ----------------------- All perfusion runs ---------------------
+  dwi: []     # ----------------------- All diffusion runs ---------------------
+  fmap: []     # ----------------------- All fieldmap runs ----------------------
+  extra_data: []     # ----------------------- All extra data -------------------------
+  exclude: []     # ----------------------- Data that will be left out -------------
