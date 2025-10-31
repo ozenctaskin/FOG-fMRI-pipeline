@@ -43,16 +43,21 @@ function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, blur,
     % per subject, so get the first encountered bto image in the directory.
     allSes = dir(fullfile(dataFolder, subjectID, 'ses-*'));
     for ii = 1:length(allSes)
-        anatDir = dir(fullfile(allSes(ii).folder, allSes(ii).name, 'anat', '*btoMPRAGE2x11mmiso*'));
-        if ~isempty(anatDir)
-            T1w = fullfile(allSes(ii).folder, allSes(ii).name, 'anat', [subjectID '_' allSes(ii).name '_acq-btoMPRAGE2x11mmiso_T1w.nii.gz']);
-            fprintf(['\n Found the anatomical image ' T1w ' Stopping search\n']);
+        anatDir = fullfile(allSes(ii).folder, allSes(ii).name, 'anat');
+        if isfolder(anatDir)
+            if isfile(fullfile(allSes(ii).folder, allSes(ii).name, 'anat', [subjectID '_' allSes(ii).name '_acq-btoMPRAGE2x11mmiso_T1w.nii.gz']))
+                T1w = fullfile(allSes(ii).folder, allSes(ii).name, 'anat', [subjectID '_' allSes(ii).name '_acq-btoMPRAGE2x11mmiso_T1w.nii.gz']);
+                fprintf(['\n Found the anatomical image ' T1w ' Stopping search\n']);
+            elseif isfile(fullfile(allSes(ii).folder, allSes(ii).name, 'anat', [subjectID '_' allSes(ii).name '_acq-AxialT1wMPR_T1w.nii.gz']))
+                T1w = fullfile(allSes(ii).folder, allSes(ii).name, 'anat', [subjectID '_' allSes(ii).name '_acq-AxialT1wMPR_T1w.nii.gz']);
+                fprintf(['\n Found the anatomical image ' T1w ' Stopping search\n']);
+            else
+                error('Your subject does not have an anatomical image in any of the session. You need an anat folder in one of your session folders containing a btoMPRAGE2x11mmiso_T1w or a AxialT1wMPR_T1w image')
+            end
             break;
         end
     end
-    if ~isfile(T1w)
-        error(['Cannot find the T1 image. Check what is wrong with the following image ' T1w]);
-    end
+
     % MNITemplate = fullfile(getenv('FSLDIR'), 'data', 'standard', 'MNI152_T1_1mm.nii.gz');
 
     % Run recon all and SUMA if skipPCA is not supplied 
