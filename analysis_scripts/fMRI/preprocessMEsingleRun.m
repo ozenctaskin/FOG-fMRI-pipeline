@@ -85,6 +85,7 @@ function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, blur,
         if ~isfolder(fullfile(dataFolder, subjectID, [subjectID '_freesurfer'])) 
             [~, T1name, T1ext] = fileparts(T1w);
             if exist('T2w', 'var')
+                [~, T2name, T2ext] = fileparts(T2w);
                 if strcmp(freesurferBuild, 'docker')
                     system(['docker run -it --rm -v ' T1w ':/anat/' [T1name,T1ext] ' -v ' T2w ':/anat/' [T2name,T2ext] ' -v ' fullfile(dataFolder, subjectID) ':/subjects freesurfer:latest recon-all -i ' fullfile('/anat', [T1name,T1ext]) ' -T2 ' fullfile('/anat', [T2name,T2ext]) ' -T2pial -sd /subjects -s ' [subjectID '_freesurfer'] ' -all']);
                 elseif strcmp(freesurferBuild, 'local')
