@@ -1,4 +1,4 @@
-function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, blur, skipPCA, combineMethod, warpSet)
+function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, blur, skipPCA, combineMethod, warpSet, freesurferBuild)
 
     % IMPORTANT!!!! This script won't run if you do not start MATLAB from 
     % your terminal. If you are on linux, run "matlab" on your terminal. 
@@ -16,8 +16,8 @@ function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, blur,
     % multi-echo imaging only. When the function is run, the analysis is 
     % done twice with the blur you set and without blur. Separate folders 
     % for each run and each blur level is created automatically in your
-    % bids folder. final_func.nii and final_anat.nii in these folders are
-    % your final preprocessed images in NIFTI format.
+    % bids folder. final_func.nii and final_anat.nii in these result
+    % folders are your final preprocessed images in NIFTI format.
     %
     %`  Input:
     %
@@ -33,14 +33,27 @@ function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, blur,
     %   PCA. 
     %   combineMethod: Echo combination method, check afni_proc.py for 
     %   details. 'm_tedana_m_tedort' is a good option here.
+    %   warpSet: Warp calculations between anatomical and template space.
+    %   This function also outputs a variable with the same name which can
+    %   be passed to a second run, for example if you are running the same
+    %   subject with the same anatomical images. If you are running this 
+    %   script for a subject for the first time, set this to 'NA'. If you 
+    %   are running it again for the same subject but different session, 
+    %   pass the warpSet output of this function to he next iteration. If 
+    %   you do not know how to do this, always set this to 'NA'.
+    %   freesurferBuild: This could be either 'docker' or 'local'. The
+    %   docker version is the latest version on the Chenlab linux computer,
+    %   so if you pick 'local', v7.4.1 will be run instead of v8.1.0.
+    %   Ignored if skipPCA is set to true.
 
-    % Convert blur input to string if it is numeric
+    % Convert blur input to string if input is numeric
     if isnumeric(blur)
         blur = num2str(blur);
     end
 
-    % Get the T1 from the subject. We ideally want to use one anatomical
-    % per subject, so get the first encountered bto image in the directory.
+    % Go through all session folders in a subject folder and find the T1
+    % and T2 weighted images. If no T2 is found, Freesurfer is run only
+    % with T1. 
     allSes = dir(fullfile(dataFolder, subjectID, 'ses-*'));
     for ii = 1:length(allSes)
         anatDir = fullfile(allSes(ii).folder, allSes(ii).name, 'anat');
@@ -52,26 +65,53 @@ function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, blur,
                 T1w = fullfile(allSes(ii).folder, allSes(ii).name, 'anat', [subjectID '_' allSes(ii).name '_acq-AxialT1wMPR_T1w.nii.gz']);
                 fprintf(['\n Found the anatomical image ' T1w ' Stopping search\n']);
             else
-                error('Your subject does not have an anatomical image in any of the session. You need an anat folder in one of your session folders containing a btoMPRAGE2x11mmiso_T1w or a AxialT1wMPR_T1w image')
+                error('Your subject does not have a T1 image in any of the session. You need an anat folder in one of your session folders containing a btoMPRAGE2x11mmiso_T1w or a AxialT1wMPR_T1w image')
+            end
+            if isfile(fullfile(allSes(ii).folder, allSes(ii).name, 'anat', [subjectID '_' allSes(ii).name '_acq-btoSPACET22x2CAIPI1mmiso_T2w']))
+                T2w = fullfile(allSes(ii).folder, allSes(ii).name, 'anat', [subjectID '_' allSes(ii).name '_acq-btoSPACET22x2CAIPI1mmiso_T2w.nii.gz']);
             end
             break;
         end
     end
 
+    % FSL version of the MNI template if we need this. Currently commented
+    % out
     % MNITemplate = fullfile(getenv('FSLDIR'), 'data', 'standard', 'MNI152_T1_1mm.nii.gz');
 
-    % Run recon all and SUMA if skipPCA is not supplied 
-    if ~skipPCA
+    % Run recon all and SUMA if skipPCA is not supplied. Select between
+    % docker or local versions and configure based on whether a T2 image
+    % exists.
+    if ~skipPCA  
         if ~isfolder(fullfile(dataFolder, subjectID, [subjectID '_freesurfer'])) 
-            system(['recon-all -all -subject ' subjectID '_freesurfer' ' -i ' T1w ' -sd ' fullfile(dataFolder, subjectID)]);
+            [~, T1name, T1ext] = fileparts(T1w);
+            if exist('T2w', 'var')
+                if strcmp(freesurferBuild, 'docker')
+                    system(['docker run -it --rm -v ' T1w ':/anat/' [T1name,T1ext] ' -v ' T2w ':/anat/' [T2name,T2ext] ' -v ' fullfile(dataFolder, subjectID) ':/subjects freesurfer:latest recon-all -i ' fullfile('/anat', [T1name,T1ext]) ' -T2 ' fullfile('/anat', [T2name,T2ext]) ' -T2pial -sd /subjects -s ' [subjectID '_freesurfer'] ' -all']);
+                elseif strcmp(freesurferBuild, 'local')
+                    system(['recon-all -subject ' subjectID '_freesurfer' ' -i ' T1w ' -T2 ' T2w ' -sd ' fullfile(dataFolder, subjectID) ' -T2pial -all']);
+                else
+                    error('Wrong freesurferBuild specified. Check comments for the options');
+                end
+            else
+                if strcmp(freesurferBuild, 'docker')
+                    system(['docker run -it --rm -v ' T1w ':/anat/' [T1name,T1ext] ' -v ' fullfile(dataFolder, subjectID) ':/subjects freesurfer:latest recon-all -i ' fullfile('/anat', [T1name,T1ext]) ' -sd /subjects -s ' [subjectID '_freesurfer'] ' -all']);    
+                elseif strcmp(freesurferBuild, 'local')
+                    system(['recon-all -subject ' subjectID '_freesurfer' ' -i ' T1w ' -sd ' fullfile(dataFolder, subjectID) ' -all']);
+                else
+                    error('Wrong freesurferBuild specified. Check comments for the options');
+                end
+            end
+            system(['docker run --rm -v ' fullfile(dataFolder, subjectID) ':/subjects alpine chmod -R a+rwX /subjects']); % Fix permission lock
             system(['cd ' fullfile(dataFolder, subjectID, [subjectID, '_freesurfer']) '; @SUMA_Make_Spec_FS -sid ' subjectID '_freesurfer -NIFTI']);
-        end
+        end        
+        % Get the files we need for PCA
         ventricles = fullfile(dataFolder, subjectID, [subjectID '_freesurfer'], 'SUMA', 'fs_ap_latvent.nii.gz');
         white_matter = fullfile(dataFolder, subjectID, [subjectID '_freesurfer'], 'SUMA', 'fs_ap_wm.nii.gz');   
         aseg = fullfile(dataFolder, subjectID, [subjectID '_freesurfer'], 'SUMA', 'aparc.a2009s+aseg_REN_all.nii.gz');
     end
 
-    % Find out how many runs we have
+    % Find out how many runs we have in the session based on the run-<>
+    % part of the BIDS name. 
     allFuncFiles =  dir(fullfile(dataFolder, subjectID, sessionID, 'func', '*.json'));
     try
         runNum = numel(unique(cellfun(@(f) sscanf(regexp(f, 'run-(\d+)', 'match', 'once'), 'run-%d'), {allFuncFiles.name})));
@@ -83,15 +123,25 @@ function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, blur,
         end
     end
 
-    % Loop through blur and no blur loops
-    for blurs = 1:2
+    % We run preprocessing twice, one with the specified blur amount and
+    % one without blur. Different versions will be used for seed-brain and
+    % ROI-ROI analyses respectively. So do 2 iterations. That's unless the
+    % blur is set to 'NA' to begin with. In which case, only one iteration
+    % is run.
+    if strcmp(blur, 'NA')
+        iteration = 1;
+    else
+        iteration = 2;
+    end
 
-        % We run twice with and without blur, so the second run is no blur
+    % Run through iterations
+    for blurs = 1:iteration
+        % If we are in the second loop, set blur to 'NA'
         if isequal(blurs,2)
             blur = 'NA';
         end
 
-        % Loop through the runs
+        % Loop through each run in a session
         for ii = 1:runNum
             
             % If we only have a single run, look for images without _run
@@ -108,18 +158,19 @@ function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, blur,
             end
     
             % Insert slice timing info from json to nifti only in the first
-            % blur run. No need to do this twice
+            % blur run. Print a warning about not stopping here, as
+            % stopping halfway through this function casuses images to get
+            % corrupted
             if isequal(blurs,1)
                 fprintf('\nAdding slice time information to data. Do not stop the script now or your MRI images get corrupted.\n');
                 system(['abids_tool.py -add_slice_times -input ' funcDataset]);
             end
     
-            % Prepare pipeline. Start with an empty line
+            % Prepare afni pipeline script. Start with an empty line
             afni_line = '';
             warpSet = afniWrapper(dataFolder, subjectID, sessionID, T1w, blipForward, blipReverse, funcDataset, combineMethod, blur, aseg, ventricles, white_matter, warpSet, skipPCA);
         
-            % Add the run number to the proc script that AFNI creates and
-            % start the analysis script
+            % Add the run number to the proc script that AFNI creates.
             procScript = fullfile(dataFolder, subjectID, sessionID, ['proc.' subjectID]);
             if strcmp(blur, 'NA')
                 if isequal(runNum, 1)
@@ -139,9 +190,12 @@ function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, blur,
                 end
             end
             system(['mv ' procScript ' ' newProcName]);
+
+            % Start the preprocessing. 
             system(['cd ' fullfile(dataFolder, subjectID, sessionID) '; ' 'tcsh -xef ' newProcName ' 2>&1 | tee ' outputReport]);
     
-            % Add the run number to the folder
+            % Add the run number to the output folder once preprocessing is
+            % done.
             outputFolder = fullfile(dataFolder, subjectID, sessionID, [subjectID '.results']);
             if strcmp(blur, 'NA')
                 if isequal(runNum, 1)
@@ -172,12 +226,11 @@ function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, blur,
     end
 end
 
-
+% AFNI preprocessing wrapper function for some prespecified options.
 function warpSet = afniWrapper(dataFolder, subjectID, sessionID, T1w, blipForward, blipReverse, funcDataset, combineMethod, blur, aseg, ventricles, white_matter, warpSet, skipPCA)
 
-    % Build and run the preprocessing setup. No blurring. If you need to
-    % add it back. It needs to come after combine block. Also add the below
-    % info to the main body
+    % The concrete block which will be present regardless of different
+    % options
     afni_line = ['cd ' fullfile(dataFolder, subjectID, sessionID) ';' 'afni_proc.py ' ...,
     '-subj_id ' subjectID ' ' ...,
     '-radial_correlate_blocks tcat volreg regress ' ...,
@@ -210,23 +263,24 @@ function warpSet = afniWrapper(dataFolder, subjectID, sessionID, T1w, blipForwar
     '-html_review_style pythonic ' ..., 
     '-remove_preproc_files'];
     
-    % If blur is specified, add it to the function. 
+    % If blur is specified, add step to the preprocessing list and blur
+    % size to the end of the concrete line
     if ~strcmp(blur, 'NA')
         afni_line = [afni_line ' -blur_size ' blur ' -blur_in_mask yes -blocks despike tshift align tlrc volreg mask combine blur scale regress'];
     else
         afni_line = [afni_line ' -blocks despike tshift align tlrc volreg mask combine scale regress'];
     end
     
-    % Check if PCA is skipped or not 
+    % If PCA is not skipped, add it to the line as well
     if ~skipPCA
         afni_line = [afni_line ' -anat_follower_ROI aaseg anat ' aseg ' -anat_follower_ROI aeseg epi ' aseg ' -anat_follower_ROI FSvent epi ' ventricles  ' -anat_follower_ROI FSWe epi ' white_matter ' -anat_follower_erode FSvent FSWe -regress_ROI_PC FSvent 3 -regress_ROI_PC_per_run FSvent -regress_anaticor_fast -regress_anaticor_label FSWe -regress_make_corr_vols aeseg FSvent'];
     end
     
-    % Add warps if supplied
+    % Add the suppled warps if avaialable
     if ~strcmp(warpSet, 'NA')
         afni_line = [afni_line ' -tlrc_NL_warped_dsets ' warpSet{1} ' ' warpSet{2} ' ' warpSet{3}];
     end
     
-    % Run the afni line
+    % Run the afni script creation
     system(afni_line);
 end
