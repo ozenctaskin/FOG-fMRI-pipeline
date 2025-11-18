@@ -65,7 +65,7 @@ function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, blur,
                 T1w = fullfile(allSes(ii).folder, allSes(ii).name, 'anat', [subjectID '_' allSes(ii).name '_acq-AxialT1wMPR_T1w.nii.gz']);
                 fprintf(['\n Found the anatomical image ' T1w ' Stopping search\n']);
             else
-                error('Your subject does not have a T1 image in any of the session. You need an anat folder in one of your session folders containing a btoMPRAGE2x11mmiso_T1w or a AxialT1wMPR_T1w image')
+                error('Your subject either does not have a T1 image or have multiple runs of it. You need an anat folder in at least one of your sessions containing a btoMPRAGE2x11mmiso_T1w.nii.gz or a AxialT1wMPR_T1w.nii.gz image. if you have multiple T1 runs, it is probably because the acquisition was repeated due to bad quality. Pick the better one (ie. by loading it to fsleyes) and manually delete the _run-<num> part of the name of the image you want to use.')
             end
             if isfile(fullfile(allSes(ii).folder, allSes(ii).name, 'anat', [subjectID '_' allSes(ii).name '_acq-btoSPACET22x2CAIPI1mmiso_T2w']))
                 T2w = fullfile(allSes(ii).folder, allSes(ii).name, 'anat', [subjectID '_' allSes(ii).name '_acq-btoSPACET22x2CAIPI1mmiso_T2w.nii.gz']);
