@@ -1,4 +1,4 @@
-function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, blur, skipPCA, combineMethod, warpSet, freesurferBuild)
+function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, blur, skipPCA, combineMethod, warpSet, freesurferBuild, motionThreshold)
 
     % IMPORTANT!!!! This script won't run if you do not start MATLAB from 
     % your terminal. If you are on linux, run "matlab" on your terminal. 
@@ -51,6 +51,11 @@ function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, blur,
         blur = num2str(blur);
     end
 
+    % Convert motion threshold to string
+    if isnumeric(motionThreshold)
+        motionThreshold = num2str(motionThreshold);
+    end
+
     % Go through all session folders in a subject folder and find the T1
     % and T2 weighted images. If no T2 is found, Freesurfer is run only
     % with T1. 
@@ -65,7 +70,7 @@ function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, blur,
                 T1w = fullfile(allSes(ii).folder, allSes(ii).name, 'anat', [subjectID '_' allSes(ii).name '_acq-AxialT1wMPR_T1w.nii.gz']);
                 fprintf(['\n Found the anatomical image ' T1w ' Stopping search\n']);
             else
-                error('Your subject either does not have a T1 image or have multiple runs of it. You need an anat folder in at least one of your sessions containing a btoMPRAGE2x11mmiso_T1w.nii.gz or a AxialT1wMPR_T1w.nii.gz image. if you have multiple T1 runs, it is probably because the acquisition was repeated due to bad quality. Pick the better one (ie. by loading it to fsleyes) and manually delete the _run-<num> part of the name of the image you want to use.')
+                error(['Your subject ' subjectID ' either does not have a T1 image or have multiple runs of it. You need an anat folder in at least one of your sessions containing a btoMPRAGE2x11mmiso_T1w.nii.gz or a AxialT1wMPR_T1w.nii.gz image. if you have multiple T1 runs, it is probably because the acquisition was repeated due to bad quality. Pick the better one (ie. by loading it to fsleyes) and manually delete the _run-<num> part of the name of the image you want to use.'])
             end
             if isfile(fullfile(allSes(ii).folder, allSes(ii).name, 'anat', [subjectID '_' allSes(ii).name '_acq-btoSPACET22x2CAIPI1mmiso_T2w']))
                 T2w = fullfile(allSes(ii).folder, allSes(ii).name, 'anat', [subjectID '_' allSes(ii).name '_acq-btoSPACET22x2CAIPI1mmiso_T2w.nii.gz']);
@@ -228,7 +233,7 @@ function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, blur,
 end
 
 % AFNI preprocessing wrapper function for some prespecified options.
-function warpSet = afniWrapper(dataFolder, subjectID, sessionID, T1w, blipForward, blipReverse, funcDataset, combineMethod, blur, aseg, ventricles, white_matter, warpSet, skipPCA)
+function warpSet = afniWrapper(dataFolder, subjectID, sessionID, T1w, blipForward, blipReverse, funcDataset, combineMethod, blur, aseg, ventricles, white_matter, warpSet, skipPCA, motionThreshold)
 
     % The concrete block which will be present regardless of different
     % options
@@ -256,7 +261,7 @@ function warpSet = afniWrapper(dataFolder, subjectID, sessionID, T1w, blipForwar
     '-echo_times 13.20 29.94 46.66 -reg_echo 2 ' ..., 
     '-mask_epi_anat yes ' ...,
     '-regress_motion_per_run ' ...,
-    '-regress_censor_motion 0.2 ' ...,
+    '-regress_censor_motion ' motionThreshold ...,
     '-regress_censor_outliers 0.05 ' ..., 
     '-regress_apply_mot_types demean deriv ' ..., 
     '-regress_est_blur_epits ' ...,
