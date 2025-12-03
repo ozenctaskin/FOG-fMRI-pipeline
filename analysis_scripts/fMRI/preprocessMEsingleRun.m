@@ -174,7 +174,7 @@ function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, blur,
     
             % Prepare afni pipeline script. Start with an empty line
             afni_line = '';
-            warpSet = afniWrapper(dataFolder, subjectID, sessionID, T1w, blipForward, blipReverse, funcDataset, combineMethod, blur, aseg, ventricles, white_matter, warpSet, skipPCA);
+            warpSet = afniWrapper(dataFolder, subjectID, sessionID, T1w, blipForward, blipReverse, funcDataset, combineMethod, blur, aseg, ventricles, white_matter, warpSet, skipPCA, motionThreshold);
         
             % Add the run number to the proc script that AFNI creates.
             procScript = fullfile(dataFolder, subjectID, sessionID, ['proc.' subjectID]);
@@ -261,7 +261,7 @@ function warpSet = afniWrapper(dataFolder, subjectID, sessionID, T1w, blipForwar
     '-echo_times 13.20 29.94 46.66 -reg_echo 2 ' ..., 
     '-mask_epi_anat yes ' ...,
     '-regress_motion_per_run ' ...,
-    '-regress_censor_motion ' motionThreshold ...,
+    '-regress_censor_motion ' motionThreshold ' ' ...,
     '-regress_censor_outliers 0.05 ' ..., 
     '-regress_apply_mot_types demean deriv ' ..., 
     '-regress_est_blur_epits ' ...,
