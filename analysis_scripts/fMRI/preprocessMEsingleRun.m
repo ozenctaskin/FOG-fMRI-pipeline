@@ -114,6 +114,10 @@ function warpSet = preprocessMEsingleRun(dataFolder, subjectID, sessionID, blur,
         ventricles = fullfile(dataFolder, subjectID, [subjectID '_freesurfer'], 'SUMA', 'fs_ap_latvent.nii.gz');
         white_matter = fullfile(dataFolder, subjectID, [subjectID '_freesurfer'], 'SUMA', 'fs_ap_wm.nii.gz');   
         aseg = fullfile(dataFolder, subjectID, [subjectID '_freesurfer'], 'SUMA', 'aparc.a2009s+aseg_REN_all.nii.gz');
+    else
+        ventricles = 'NA';
+        white_matter = 'NA';
+        aseg = 'NA';
     end
 
     % Find out how many runs we have in the session based on the run-<>
